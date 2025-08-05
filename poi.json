@@ -1,0 +1,49 @@
+[
+    [
+        { "name": "RUB", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["uni", "studenten"], "activeHours": [8, 20] },
+        { "name": "Bibliothek", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["bücher", "studium"], "activeHours": [9, 19] },
+        { "name": "Schule", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["lernen", "unterricht"], "activeHours": [8, 16] },
+        { "name": "Volkshochschule", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["kurse", "bildung"], "activeHours": [9, 21] },
+        { "name": "Fachhochschule", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["studium", "technik"], "activeHours": [8, 20] },
+        { "name": "Kindergarten", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["kinder", "vorschule"], "activeHours": [7, 17] }
+    ],
+    [
+        { "name": "Kunstmuseum", "lat": 51.447, "lng": 7.263, "type": "Kultur", "tags": ["museum", "kunst"], "activeHours": [10, 18] },
+        { "name": "Theater", "lat": 51.479, "lng": 7.217, "type": "Kultur", "tags": ["aufführung", "kunst"], "activeHours": [19, 23] },
+        { "name": "Konzerthalle", "lat": 51.479, "lng": 7.217, "type": "Kultur", "tags": ["musik", "konzert"], "activeHours": [18, 23] },
+        { "name": "Oper", "lat": 51.479, "lng": 7.217, "type": "Kultur", "tags": ["bühne", "aufführung"], "activeHours": [19, 23] },
+        { "name": "Museum für Naturkunde", "lat": 51.478, "lng": 7.219, "type": "Kultur", "tags": ["natur", "wissenschaft"], "activeHours": [10, 18] },
+        { "name": "Kunstschule", "lat": 51.478, "lng": 7.219, "type": "Bildung", "tags": ["kunst", "lernen"], "activeHours": [10, 20] }
+    ],
+    [
+        { "name": "Bermuda3Eck", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["bar", "nacht"], "activeHours": [16, 2] },
+        { "name": "Kino", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["film", "unterhaltung"], "activeHours": [14, 23] },
+        { "name": "Stadtpark", "lat": 51.478, "lng": 7.219, "type": "Natur", "tags": ["park", "entspannen"], "activeHours": [6, 20] },
+        { "name": "Zoo", "lat": 51.447, "lng": 7.263, "type": "Natur", "tags": ["tiere", "familie"], "activeHours": [9, 18] },
+        { "name": "Botanischer Garten", "lat": 51.478, "lng": 7.219, "type": "Natur", "tags": ["pflanzen", "entspannen"], "activeHours": [8, 20] },
+        { "name": "Stadion", "lat": 51.479, "lng": 7.217, "type": "Sport", "tags": ["fussball", "spiele"], "activeHours": [12, 22] },
+        { "name": "Fitnessstudio", "lat": 51.478, "lng": 7.219, "type": "Sport", "tags": ["training", "gesundheit"], "activeHours": [6, 22] },
+        { "name": "Schwimmbad", "lat": 51.447, "lng": 7.263, "type": "Freizeit", "tags": ["wasser", "entspannen"], "activeHours": [8, 21] },
+        { "name": "Jugendzentrum", "lat": 51.447, "lng": 7.263, "type": "Bildung", "tags": ["jugend", "bildung"], "activeHours": [10, 22] },
+        { "name": "Spielplatz", "lat": 51.447, "lng": 7.263, "type": "Freizeit", "tags": ["kinder", "spielen"], "activeHours": [8, 20] },
+        { "name": "Sportplatz", "lat": 51.447, "lng": 7.263, "type": "Sport", "tags": ["spiele", "training"], "activeHours": [8, 20] },
+        { "name": "Eisdiele", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["eis", "sommer"], "activeHours": [10, 22] },
+        { "name": "Kletterhalle", "lat": 51.478, "lng": 7.219, "type": "Sport", "tags": ["klettern", "abenteuer"], "activeHours": [10, 22] },
+        { "name": "Freizeitbad", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["schwimmen", "spaß"], "activeHours": [9, 21] },
+        { "name": "Tennisplatz", "lat": 51.478, "lng": 7.219, "type": "Sport", "tags": ["tennis", "spiele"], "activeHours": [8, 20] },
+        { "name": "Skatepark", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["skaten", "jugend"], "activeHours": [8, 20] },
+        { "name": "Tanzschule", "lat": 51.479, "lng": 7.217, "type": "Freizeit", "tags": ["tanzen", "spaß"], "activeHours": [10, 22] },
+        { "name": "Bowlingbahn", "lat": 51.478, "lng": 7.219, "type": "Freizeit", "tags": ["bowling", "spiel"], "activeHours": [10, 23] },
+        { "name": "Minigolfplatz", "lat": 51.478, "lng": 7.219, "type": "Freizeit", "tags": ["minigolf", "spaß"], "activeHours": [10, 22] }
+    ],
+    [
+        { "name": "Hauptbahnhof", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["bahn", "bus"], "activeHours": [0, 24] },
+        { "name": "U-Bahn-Station", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["u-bahn", "stadtverkehr"], "activeHours": [0, 24] },
+        { "name": "Flughafen", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["flugzeug", "reisen"], "activeHours": [0, 24] },
+        { "name": "Busbahnhof", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["busse", "reisen"], "activeHours": [0, 24] },
+        { "name": "Parkhaus", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["parken", "auto"], "activeHours": [0, 24] },
+        { "name": "Taxistand", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["taxi", "transport"], "activeHours": [0, 24] },
+        { "name": "Radstation", "lat": 51.479, "lng": 7.217, "type": "Verkehr", "tags": ["fahrrad", "verleih"], "activeHours": [8, 20] },
+        { "name": "Ladestation für Elektroautos", "lat": 51.478, "lng": 7.219, "type": "Verkehr", "tags": ["elektroauto", "laden"], "activeHours": [0, 24] }
+    ]
+]

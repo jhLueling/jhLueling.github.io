@@ -3,6 +3,7 @@
 <head>
 
     <title>Interactive Map Example</title>
+    <meta charset="utf-8" />
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -37,6 +38,8 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
+    <script src="/js/leaflet-0.7.2/leaflet.ajax.min.js"></script>
+
     <script
         src="https://rawgit.com/k4r573n/leaflet-control-osm-geocoder/master/Control.OSMGeocoder.js">
     </script>
@@ -62,6 +65,9 @@
         }
 
         map.on('click', onMapClick);
+
+        var geojsonLayer = new L.GeoJSON.AJAX("poi.geojson");       
+        geojsonLayer.addTo(map);
 
         // Add OpenStreetMap geocoding control to the map for address search functionality
         var osmGeocoder = new L.Control.OSMGeocoder({
