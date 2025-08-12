@@ -45,17 +45,18 @@
     </script>
 
     <script>
-        var map = L.map('int_map').setView([51.48, 7.22], 13);
+        var map = L.map('int_map').setView([51.481846, 7.216236], 5);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            minZoom: 13,
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
 
-        var popup = L.popup()
-            .setLatLng([51.48, 7.22])
-            .setContent("I am a standalone popup.")
-            .openOn(map);
+        //var popup = L.popup()
+        //   .setLatLng([51.48, 7.22])
+        //    .setContent("I am a standalone popup.")
+        //    .openOn(map);
 
         //function onMapClick(e) {
         //    popup
