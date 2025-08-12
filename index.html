@@ -66,7 +66,15 @@
 
         map.on('click', onMapClick);
 
-        var geojsonLayer = new L.GeoJSON.AJAX("poi.geojson");       
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);
+            }
+        }
+
+        var geojsonLayer = new L.GeoJSON.AJAX("poi.geojson",  {
+            onEachFeature: onEachFeature
+        });
         geojsonLayer.addTo(map);
 
         // Add OpenStreetMap geocoding control to the map for address search functionality
