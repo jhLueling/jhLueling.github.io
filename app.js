@@ -1,6 +1,7 @@
 
 // 1. Verbindung zu Supabase aufbauen
-const { createClient } = supabase;
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
 const supabaseUrl = 'https://wtellkdlpfsoqankwbua.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0ZWxsa2RscGZzb3Fhbmt3YnVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY5NzY0ODYsImV4cCI6MjA3MjU1MjQ4Nn0.E4KpTEKEflzEp2-wI9uuBuyLtlmY9fpmeFRNkVQQ3oo';
 const supabase = createClient(supabaseUrl, supabaseKey);
