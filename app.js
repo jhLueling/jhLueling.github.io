@@ -1,5 +1,5 @@
 
-// 1. Verbindung zu Supabase aufbauen
+// Verbindung zu Supabase aufbauen
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const supabaseUrl = 'https://wtellkdlpfsoqankwbua.supabase.co';
@@ -7,7 +7,55 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 console.log('Supabase ist bereit:', supabase);
 
-// 2. Map initialisieren
+const output = document.getElementById('output');
+
+// Registrierung
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+
+  const { data, error } = await supabase.auth.signUp({ email, password });
+
+  output.textContent = error
+    ? 'Registrierungs-Fehler: ' + error.message
+    : 'Registrierung erfolgreich: ' + data.user.email;
+});
+
+// Login
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    output.textContent = 'Login-Fehler: ' + error.message;
+    return;
+  }
+
+  output.textContent = 'Eingeloggt als: ' + data.user.email;
+  document.getElementById('username-form').style.display = 'block';
+});
+
+// Username speichern
+document.getElementById('set-username-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('username').value;
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({ id: user.id, username: username });
+
+  output.textContent = error
+    ? 'Fehler beim Speichern des Usernames: ' + error.message
+    : 'Username erfolgreich gespeichert: ' + username;
+});
+
+// Map initialisieren
 //var map = L.map('int_map').setView([51.481846, 7.216236], 4);
 var map = L.map('int_map').fitWorld();
 
@@ -17,7 +65,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-// 3. Auf Position des Nutzers zentrieren
+// Auf Position des Nutzers zentrieren
 map.locate({setView: true, maxZoom: 16});
 
 function onLocationFound(e) {
@@ -70,6 +118,6 @@ var osmGeocoder = new L.Control.OSMGeocoder({
 
 map.addControl(osmGeocoder);
 
-// 4. POIs aus Supabase laden und auf die Karte bringen
+// POIs aus Supabase laden und auf die Karte bringen
 const { data, error } = await supabase.from('pois').select('*');
 console.log(data, error);
