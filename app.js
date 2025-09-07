@@ -9,6 +9,17 @@ console.log('Supabase ist bereit:', supabase);
 
 const output = document.getElementById('output');
 
+async function initMap() {
+    //const map = L.map('int_map').setView([51.481846, 7.216236], 4);
+    const map = L.map('int_map').fitWorld();
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        minZoom: 13,
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    return map;
+}
+
 // Registrierung
 document.getElementById('register-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -56,14 +67,9 @@ document.getElementById('set-username-form').addEventListener('submit', async (e
 });
 
 // Map initialisieren
-//var map = L.map('int_map').setView([51.481846, 7.216236], 4);
-var map = L.map('int_map').fitWorld();
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    minZoom: 13,
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
+document.getElementById('auth-container').style.display = 'none';
+document.getElementById('map-container').style.display = 'block';
+const map = await initMap();
 
 // Auf Position des Nutzers zentrieren
 map.locate({setView: true, maxZoom: 16});
