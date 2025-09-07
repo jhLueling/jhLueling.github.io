@@ -16,9 +16,12 @@
             margin: 0;
             padding: 0;
         }
-        html, body, #int_map {
+        html, body, #map-container {
             width: 100vw;
             height: 100vh;
+        }
+        #map-container {
+            display: none;
         }
     </style>
 
@@ -30,46 +33,32 @@
 
 <body>
 
-    <div id="int_map"></div>
-
     <!-- Libraries -->
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
     <script src="https://cdn.jsdelivr.net/gh/calvinmetcalf/leaflet-ajax@v2.1.0/dist/leaflet.ajax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/k4r573n/leaflet-control-osm-geocoder@master/Control.OSMGeocoder.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>-->
 
-    <h1>Supabase Auth Demo</h1>
+    <div id="auth-container">
+        <h1>Supabase Auth Demo</h1>
 
-    <!-- Registrierung -->
-    <h2>Registrieren</h2>
-    <form id="register-form">
+        <h2>Registrieren</h2>
         <input type="email" id="register-email" placeholder="Email" required>
         <input type="password" id="register-password" placeholder="Passwort" required>
-        <button type="submit">Registrieren</button>
-    </form>
+        <input type="text" id="register-username" placeholder="Username">
+        <button id="register-btn">Registrieren</button>
 
-    <!-- Login -->
-    <h2>Login</h2>
-    <form id="login-form">
+        <h2>Login</h2>
         <input type="email" id="login-email" placeholder="Email" required>
         <input type="password" id="login-password" placeholder="Passwort" required>
-        <button type="submit">Login</button>
-    </form>
-
-    <!-- Username setzen -->
-    <div id="username-form" style="display:none;">
-        <h2>Username festlegen</h2>
-        <form id="set-username-form">
-        <input type="text" id="username" placeholder="Username" required>
-        <button type="submit">Speichern</button>
-        </form>
+        <button id="login-btn">Login</button>
     </div>
+    
 
-    <pre id="output"></pre>
+    <div id="map-container"></div>
 
     <!-- Code -->
     <script type="module" src="app.js"></script>
