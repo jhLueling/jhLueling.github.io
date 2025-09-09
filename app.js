@@ -29,8 +29,8 @@ function onLocationError(e) {
 function setDarkLayer() {
   if (!darkLayer) {
     darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      minZoom: 0,
-      maxZoom: 20,
+      minZoom: 13,
+      maxZoom: 19,
       opacity: 0.8,  // statt 1
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
     }).addTo(map);
@@ -77,6 +77,7 @@ async function initMap() {
 
     if (map) {
       map.remove();   // alte Karte komplett löschen
+      map = null;
     } 
 
     map = L.map('map').fitWorld();
@@ -159,9 +160,6 @@ async function handleRegistration(email, password, username) {
 
   // 3. Popup anzeigen
   document.getElementById('prefs-popup').style.display = 'block';
-
-  // 3. Map anzeigen
-  //await showMap();
 }
 
 // Login
@@ -260,8 +258,7 @@ document.getElementById('save-prefs-btn').addEventListener('click', async () => 
     document.getElementById('prefs-popup').style.display = 'none';
   }
 
-    // Jetzt die Karte anzeigen
-    showMap();
+  showMap();
 });
 //document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
