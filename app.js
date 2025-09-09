@@ -73,6 +73,10 @@ function applyAutoDarkmode(lat, lng) {
 //  Karte initialisieren
 async function initMap() {
     //const map = L.map('map-container').setView([51.481846, 7.216236], 4);
+
+    if (map) {
+      map.remove();   // alte Karte komplett löschen
+    }
     map = L.map('map').fitWorld();
     setLightLayer();
     setDarkLayer();
