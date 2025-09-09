@@ -196,6 +196,14 @@ async function handleLogout() {
   if (error) {
     alert('Logout fehlgeschlagen: ' + error.message);
   } else {
+
+    if (map) {
+      map.remove();  // Leaflet-Objekte entsorgen
+      map = null;
+      lightLayer = null;
+      darkLayer = null;
+    }
+    
     // Session ist beendet → Map verstecken, Auth-Formular anzeigen
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('auth-container').style.display = 'block';
