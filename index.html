@@ -6,24 +6,11 @@
     <title>Interactive Map Example</title>
 
     <!-- Links -->
+    <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""/>
     <link rel="stylesheet" href="https://rawgit.com/k4r573n/leaflet-control-osm-geocoder/master/Control.OSMGeocoder.css"/>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
-        html, body, #map-container {
-            width: 100vw;
-            height: 100vh;
-        }
-        #map-container {
-            display: none;
-        }
-    </style>
 
     <!--ToDo: Meta Bearbeiten-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -40,6 +27,8 @@
 
     <script src="https://cdn.jsdelivr.net/gh/calvinmetcalf/leaflet-ajax@v2.1.0/dist/leaflet.ajax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/k4r573n/leaflet-control-osm-geocoder@master/Control.OSMGeocoder.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/suncalc"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>-->
 
     <div id="auth-container">
@@ -56,12 +45,46 @@
         <input type="password" id="login-password" placeholder="Passwort" required>
         <button id="login-btn">Login</button>
     </div>
+
+    <!-- Popup für Präferenzen -->
+    <div id="prefs-popup" style="display:none; 
+        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1000; width: 300px;">
+
+    <h3>Deine Präferenzen</h3>
+    <label>
+        <input type="checkbox" value="Bildung"> Bildung
+    </label><br>
+    <label>
+        <input type="checkbox" value="Kultur"> Kultur
+    </label><br>
+    <label>
+        <input type="checkbox" value="Freizeitaktivitäten"> Freizeitaktivitäten
+    </label><br>
+    <label>
+        <input type="checkbox" value="Verkehr"> Verkehr
+    </label><br>
+    <label>
+        <input type="checkbox" value="Sport"> Sport
+    </label><br>
+    <label>
+        <input type="checkbox" value="Gastronomie"> Gastronomie
+    </label><br><br>
+
+    <button id="save-prefs-btn">Speichern</button>
+    </div>
+
     
 
-    <div id="map-container"></div>
+    <div id="map-container">
+        <!--<button id="logout-btn">Logout</button>-->
+        <div id="map"></div>
+    </div>
 
     <!-- Code -->
-    <script type="module" src="app.js"></script>
+    <!--<script type="module" src="app.js"></script>-->
+    <script src="app.js"></script>
     
 </body>
 </html>
