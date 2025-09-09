@@ -29,27 +29,29 @@ function onLocationError(e) {
 function setDarkLayer() {
   if (!darkLayer) {
     darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      minZoom: 13,
+      minZoom: 9,
       maxZoom: 19,
       opacity: 0.8,  // statt 1
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-    }).addTo(map);
+    });
   }
 }
 function setLightLayer() {
   if (!lightLayer) {
     lightLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          minZoom: 13,
+          minZoom: 9,
           maxZoom: 19,
           attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map);
+      });
   }
 }
 function applyDarkMode(isDark) {
   if (isDark) {
+    setDarkLayer(); 
     if (map.hasLayer(lightLayer)) map.removeLayer(lightLayer);
     if (!map.hasLayer(darkLayer)) darkLayer.addTo(map);
   } else {
+    setLightLayer();
     if (map.hasLayer(darkLayer)) map.removeLayer(darkLayer);
     if (!map.hasLayer(lightLayer)) lightLayer.addTo(map);
   }
@@ -78,11 +80,13 @@ async function initMap() {
     if (map) {
       map.remove();   // alte Karte komplett löschen
       map = null;
+      lightLayer = null;
+      darkLayer = null;
     } 
 
     map = L.map('map').fitWorld();
     setLightLayer();
-    setDarkLayer();
+    lightLayer.addTo(map);
     return map;
 }
 
