@@ -275,11 +275,23 @@ function chunkArray(arr, size) {
     return chunks;
 }
 
-function weightThresholdForZoom(zoom) {
-    // kleiner Zoom -> nur starke Gewichte
-    if (zoom <= 14) return 0.3;
-    if (zoom <= 16) return 0.1;
-    return 0; // nah dran alles anzeigen
+function computeMaxWeightLocally(userPois) {
+    if (!userPois || userPois.length === 0) return 1;
+    const weights = userPois.map(p => p.weight ?? 0);
+    return Math.max(...weights);
+}
+
+function weightThresholdForZoom(zoom, maxWeight = 1) {
+    // Basis: maxWeight in gleichmäßige Schritte teilen
+    const steps = 6; // oder 4, je nachdem
+    const step = maxWeight / steps;
+
+    if (zoom <= 12) return maxWeight - step * 1;
+    if (zoom <= 13) return maxWeight - step * 2;
+    if (zoom <= 14) return maxWeight - step * 3;
+    if (zoom <= 15) return maxWeight - step * 4;
+    if (zoom <= 16) return maxWeight - step * 5;
+    return 0;
 }
 
 async function logPrototypeError(component, error, context = {}) {
@@ -516,7 +528,9 @@ async function showMap() {
         // Event-Logging (Klicks, Zoom, Dauer)
         map.on("zoomend", () => {
             const zoom = map.getZoom();
-            const threshold = weightThresholdForZoom(zoom);
+            const maxWeight = computeMaxWeightLocally(userPois);
+            console.log("👉 MaxWeight berechnet:", maxWeight);
+            const threshold = weightThresholdForZoom(zoom, maxWeight);
 
             logInteraction({
                 event_type: "zoom",
@@ -795,7 +809,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
 
         for (const poi of userPois) {
             const reason = {};
-            let score = 0.65; // Basiswert, alle POIs starten hoch
+            let score = 0.5; // Basiswert, alle POIs starten hoch
 
             // Präferenz (nur kleiner Bonus)
             const pref = userPrefs.includes(poi.category) ? 1 : 0;
