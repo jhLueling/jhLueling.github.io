@@ -495,7 +495,7 @@ async function showMap() {
 
         // Standardmäßig alle Layer aktiv
         Object.values(categoryLayers).forEach(layer => layer.addTo(map));
-        L.control.layers(null, overlayMaps, { collapsed: false, position: 'bottomleft' }).addTo(map);
+        L.control.layers(null, overlayMaps, { collapsed: false, position: 'topleft' }).addTo(map);
 
         // After map and markers exist, compute initial weights & apply them
         (async () => {
