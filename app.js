@@ -792,7 +792,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
         allFeedback.forEach(f => { feedbackByPoi[f.poi_id] = f; });
 
         // 3️⃣ Klicks der letzten 3 Tage laden
-        const oneDaysAgo = new Date(Date.now() - 24*3600*1000).toISOString();
+        const twoDaysAgo = new Date(Date.now() - 2*24*3600*1000).toISOString();
         let allClicks = [];
         for (const chunk of poiChunks) {
             const { data, error } = await client
@@ -800,7 +800,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
                 .select('target_id')
                 .in('target_id', chunk)
                 .eq('event_type', 'click')
-                .gte('created_at', oneDaysAgo);
+                .gte('created_at', twoDaysAgo);
             if (error) throw error;
             allClicks = allClicks.concat(data);
         }
