@@ -314,24 +314,27 @@ async function showMap() {
             applyAutoDarkmode(lat, lng);
         });
 
-        // Logout Control
-        const LogoutControl = L.Control.extend({
-            options: { position: 'topright' },
-            onAdd: function(map) {
-                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-                container.innerHTML = 'Logout';
-                container.style.background = 'white';
-                container.style.cursor = 'pointer';
-                container.style.padding = '5px';
-                container.onclick = async () => { await handleLogout(); };
-                return container;
-            }
-        });
-        map.addControl(new LogoutControl());
-
         // OSM Geocoder
-        var osmGeocoder = new L.Control.OSMGeocoder({ text: 'Suchen', placeholder: 'Adresse eingeben' });
-        map.addControl(osmGeocoder);
+        var osmGeocoder = new L.Control.OSMGeocoder({ position: 'bottomright', text: 'Suchen', placeholder: 'Adresse eingeben' });
+
+        // Logout Control
+        const logoutControl = L.control({position: 'topright'});
+        logoutControl.onAdd = function(map) {
+            const btn = L.DomUtil.create('button', 'custom-map-btn');
+            btn.innerHTML = '⏻';
+            btn.title = 'Logout';
+            btn.onclick = async () => { await handleLogout(); };
+            return btn;
+        };
+
+        const locateControl = L.control({position: 'topright'});
+        locateControl.onAdd = function(map) {
+            const btn = L.DomUtil.create('button', 'custom-map-btn');
+            btn.innerHTML = '📍';
+            btn.title = 'Meine Position';
+            btn.onclick = () => map.locate({setView: true, maxZoom: 18});
+            return btn;
+        };
 
         // User POIs laden
         const { data: userData } = await client.auth.getUser();
@@ -382,25 +385,6 @@ async function showMap() {
 
                 const poiCategory = poi.category;
                 const poiSubcategory = poi.subcategory ? subTypeTranslation[poi.subcategory] || poi.subcategory : '';
-                /*
-                const fb = poi.feedback || { liked: false, rating: null };
-
-                const popupText = `
-                <b>${poi.name}</b><br>
-                ${poi.subcategory ? subTypeTranslation[poi.subcategory] || poi.subcategory : ''}<br><br>
-                <label>
-                    <input type="checkbox" class="like-checkbox" ${fb.liked ? 'checked' : ''}>
-                    Gefällt mir
-                </label><br>
-                <label>
-                    Bewertung:
-                    <select class="rating-select">
-                    <option value="">---</option>
-                    ${[1,2,3,4,5].map(n => `<option value="${n}" ${fb.rating===n?'selected':''}>${n}</option>`).join('')}
-                    </select>
-                </label><br>
-                <button class="save-feedback-btn">Speichern</button>
-                `;*/
 
                 const [lng, lat] = poi.location.coordinates;
                 const w = poi.weight ?? 0;
@@ -479,9 +463,13 @@ async function showMap() {
             }
         });
 
-        // Standardmäßig alle Layer aktiv
+        map.addControl(osmGeocoder);
+
         Object.values(categoryLayers).forEach(layer => layer.addTo(map));
-        L.control.layers(null, overlayMaps, { collapsed: false, position: 'topleft' }).addTo(map);
+        L.control.layers(null, overlayMaps, { collapsed: true, position: 'bottomleft' }).addTo(map);
+
+        logoutControl.addTo(map);
+        locateControl.addTo(map);
 
         // After map and markers exist, compute initial weights & apply them
         (async () => {
