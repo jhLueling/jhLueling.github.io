@@ -36,7 +36,3 @@ html, body, #map {
 .custom-map-btn:hover {
     background-color: #f0f0f0;
 }
-
-.leaflet-bottom.leaflet-right {
-  bottom: 50px; /* Abstand zum unteren Rand */
-}
