@@ -5,16 +5,15 @@ const supabaseKey = 'sb_publishable_4NUQh1YitkBLlKgzXu9OBA_b6GxDAXY';
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 let map;          // globale Karte
-let lightLayer;   // helles Layer
-let darkLayer;    // dunkles Layer
+let lightLayer, darkLayer;
 let categoryIcons; // Icons für Kategorien/Subtypen
-let currentSessionId; // aktuelle Session-ID
+let currentSessionId, currentUserId; // aktuelle Session-ID
 const markersByPoiId = new Map(); // poi.id -> marker
 let lastWeightComputationAt = 0;  // timestamp fürs Debouncing
 const WEIGHT_COMPUTATION_DEBOUNCE_MS = 1500; // vermeidet zu häufige Recalculations
 let recomputeTimeout = null;
-let opacityMin = 0.75, opacityMax = 1.0;
-let scaleMin   = 0.7, scaleMax   = 1.3;
+const opacityMin = 0.7, opacityMax = 1.0;
+const scaleMin   = 0.7, scaleMax   = 1.3;
 
 // Subkategorie-Übersetzung deutsch
 const subTypeTranslation = {
@@ -159,59 +158,26 @@ function computeMarkerSize(zoom, scaleFactor = 1, minS = 16, maxS = 32, minZ = 1
 }
 
 function createMarkerWithIcon(category, iconUrl, zoom = 14, scaleFactor = 1.0) {
-    // Icon-Größe basierend auf Zoom interpolieren
     const size = computeMarkerSize(zoom, scaleFactor);
-
     const color = categoryColors[category] || "#888";
-
-    // DivIcon mit runden Hintergrund und SVG
-    const divIcon = L.divIcon({
-        className: 'custom-marker',
-        html: `
-            <div style="
-                position: relative;
-                width: ${size}px;
-                height: ${size}px;
-                border-radius: 50%;
-                background-color: ${color};
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                box-shadow: 0 0 4px rgba(0,0,0,0.5);
-            ">
-                <img src="${iconUrl}" style="width: ${size * 0.6}px; height: ${size * 0.6}px;" />
-            </div>
-        `,
-        iconSize: [size, size],
-        iconAnchor: [size/2, size], // Spitze unten
-        popupAnchor: [0, -size]
-    });
-
-    return divIcon;
-}
-
-function createDefaultMarkerIcon(scaleFactor = 1, category = 'gastronomy') {
-    
-    // Icon-Größensteuerung
-    const minSize = 16;
-    const maxSize = 32;
-
-    const size = Math.round(minSize + ((maxSize - minSize) * scaleFactor));
-    const color = categoryColors[category] || '#888';
 
     return L.divIcon({
         className: 'custom-marker',
-        html: `
-            <div style="
-                width: ${size}px;
-                height: ${size}px;
-                border-radius: 50%;
-                background-color: ${color};
-                opacity: 0.6;
-                border: 2px solid #fff;
-                box-shadow: 0 0 4px rgba(0,0,0,0.4);
-            "></div>
-        `,
+        html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background-color:${color};display:flex;justify-content:center;align-items:center;box-shadow:0 0 4px rgba(0,0,0,0.5);">
+                <img src="${iconUrl}" style="width:${size*0.6}px;height:${size*0.6}px;"/>
+               </div>`,
+        iconSize: [size, size],
+        iconAnchor: [size/2, size],
+        popupAnchor: [0, -size]
+    });
+}
+function createDefaultMarkerIcon(scaleFactor = 1, category = 'gastronomy') {
+    const minSize = 16, maxSize = 32;
+    const size = Math.round(minSize + ((maxSize - minSize) * scaleFactor));
+    const color = categoryColors[category] || '#888';
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background-color:${color};opacity:0.6;border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,0.4);"></div>`,
         iconSize: [size, size],
         iconAnchor: [size/2, size],
         popupAnchor: [0, -size]
@@ -223,24 +189,13 @@ function createDefaultMarkerIcon(scaleFactor = 1, category = 'gastronomy') {
 async function fetchWeatherForLocation(lat, lon) {
     try {
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Weather fetch failed');
+        const res = await fetch(url); if (!res.ok) throw new Error('Weather fetch failed');
         const json = await res.json();
-        // current_weather: { temperature, windspeed, winddirection, weathercode, time }
         const cw = json.current_weather || {};
-        // einfache Ableitung: precipitationFlag (wenn weathercode ist Regen/Snow)
-        // weathercode docs: codes 61..67 = rain, 80..82 = rain showers, 71..77 = snow, etc.
         const code = cw.weathercode ?? null;
         const precipitation = code && ((code >= 61 && code <= 82) || (code >= 71 && code <= 77));
-        return {
-            temperature: cw.temperature ?? null,
-            weathercode: code,
-            precipitation: !!precipitation
-        };
-    } catch (err) {
-        console.warn("Weather fetch failed:", err);
-        return { temperature: null, weathercode: null, precipitation: false };
-    }
+        return { temperature: cw.temperature ?? null, weathercode: code, precipitation: !!precipitation };
+    } catch(err) { console.warn("Weather fetch failed:", err); return { temperature:null, weathercode:null, precipitation:false }; }
 }
 
 function debounceRecomputeWeights(delay = WEIGHT_COMPUTATION_DEBOUNCE_MS) {
@@ -248,24 +203,17 @@ function debounceRecomputeWeights(delay = WEIGHT_COMPUTATION_DEBOUNCE_MS) {
     recomputeTimeout = setTimeout(async () => {
         recomputeTimeout = null;
         if (!map || !currentUserId) return;
+        const userPois = Array.from(markersByPoiId.values()).map(m => m.poiData).filter(p => p);
+        if (!userPois.length) return;
 
-        try {
-            // UserPOIs lokal aus markersByPoiId
-            const userPois = Array.from(markersByPoiId.values()).map(m => m.poiData).filter(p => p);
+        const center = map.getCenter();
+        const weather = await fetchWeatherForLocation(center.lat, center.lng);
+        computePoiWeightsLocally(userPois, { lat: center.lat, lon: center.lng, weather });
 
-            if (userPois.length === 0) return;
+        // sofort in DB speichern, keine optionale Speicherung mehr
+        await saveLocalWeightsToDB(currentUserId);
 
-            const center = map.getCenter();
-            const weather = await fetchWeatherForLocation(center.lat, center.lng);
-
-            // Lokale Berechnung (ohne DB-Update)
-            computePoiWeightsLocally(userPois, { lat: center.lat, lon: center.lng, weather });
-
-            // Marker-UI anwenden
-            applyWeightsToMarkersLocally(userPois);
-        } catch (err) {
-            await logPrototypeError("debounceRecomputeWeights", err, { currentUserId });
-        }
+        applyWeightsToMarkersLocally(userPois);
     }, delay);
 }
 
@@ -277,13 +225,11 @@ function chunkArray(arr, size) {
     return chunks;
 }
 
-function normalize(w, userPois) {
-    const weights = userPois.map(p => p.weight ?? 0);
-    const min = Math.min(...weights);
-    const max = Math.max(...weights);
-
-    if (max === min) return 0.5; // alle gleich → Mitte
-    return (w - min) / (max - min);
+function normalize(weight, allPois){
+    if(!allPois.length) return 0;
+    const wMin = Math.min(...allPois.map(p=>p.weight));
+    const wMax = Math.max(...allPois.map(p=>p.weight));
+    return wMax> wMin ? (weight-wMin)/(wMax-wMin) : 0.5;
 }
 
 function computeMaxWeightLocally(userPois) {
@@ -297,43 +243,57 @@ function weightThresholdForZoom(zoom, maxWeight = 1) {
     const steps = 6; // oder 4, je nachdem
     const step = maxWeight / steps;
 
-    if (zoom <= 12) return maxWeight - step * 1;
-    if (zoom <= 13) return maxWeight - step * 2;
-    if (zoom <= 14) return maxWeight - step * 3;
-    if (zoom <= 15) return maxWeight - step * 4;
-    if (zoom <= 16) return maxWeight - step * 5;
+    if (zoom <= 13) return maxWeight - step * 1;
+    if (zoom <= 14) return maxWeight - step * 2;
+    if (zoom <= 15) return maxWeight - step * 3;
+    if (zoom <= 16) return maxWeight - step * 4;
+    if (zoom <= 17) return maxWeight - step * 5;
     return 0;
 }
 
-async function logPrototypeError(component, error, context = {}) {
-    if (!currentUserId || !currentSessionId) return;
-    try {
-        await client.from('prototype_errors').insert({
-            user_id: currentUserId,
-            session_id: currentSessionId,
-            component,
-            error_message: error?.message || String(error),
-            stack: error?.stack || null,
-            context
-        });
-        console.error(`[Prototype Error][${component}]`, error, context);
-    } catch (err) {
-        console.error("❌ Fehler beim Logging selbst:", err);
-    }
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371000, toRad = x => x*Math.PI/180;
+    const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+};
+
+function computeViewpointBonus(poi, mapCenter) {
+    if (!mapCenter || !poi.location?.coordinates) return 0;
+    const [lon, lat] = poi.location.coordinates;
+
+    const dist = haversineDistance(mapCenter.lat, mapCenter.lng, lat, lon);
+    if (dist <= 500) return 0.05; 
+    else if (dist <= 2000) return 0.05 * (1 - (dist-500)/1500);
+    return 0;
+}
+
+// ===== Fehlerlogging =====
+async function logPrototypeError(funcName, errorObj, context = {}){
+    console.error(`[Error][${funcName}]`, errorObj, context);
+    try{
+        await client.from('prototype_error_log').insert([{ function: funcName, error: errorObj?.message || errorObj, context: JSON.stringify(context), created_at: new Date().toISOString() }]);
+    }catch(e){console.warn("Logging failed", e);}
 }
 
 // ===== Map-Funktionen =====
 async function initMap() {
+    // Alte Map & Layer komplett entsorgen, falls noch vorhanden
     if (map) {
-        map.remove(); // alte Karte entsorgen
+        Object.values(categoryLayers).forEach(layer => layer.clearLayers());
+        map.remove();
         map = null;
         lightLayer = null;
         darkLayer = null;
+        markersByPoiId.clear();
     }
+
     map = L.map('map').fitWorld();
+
     setLightLayer();
     setDarkLayer();
     lightLayer.addTo(map);
+
     return map;
 }
 
@@ -461,25 +421,28 @@ async function showMap() {
                     const popupEl = e.popup._contentNode || e.popup._container;
                     if (!popupEl) return;
 
-                    // Checkbox & Rating setzen aus marker.poiData.feedback
-                    const feedback = marker.poiData.feedback || {};
                     const likeCheckbox = popupEl.querySelector('.like-checkbox');
                     const ratingSelect = popupEl.querySelector('.rating-select');
-                    if (likeCheckbox) likeCheckbox.checked = !!feedback.liked;
-                    if (ratingSelect) ratingSelect.value = feedback.rating || '';
-
                     const saveBtn = popupEl.querySelector('.save-feedback-btn');
-                    if (saveBtn) {
-                        saveBtn.onclick = async () => {
-                            const liked = likeCheckbox.checked;
-                            const rating = parseInt(ratingSelect.value || '0', 10);
 
-                            await savePoiFeedback({ userId: currentUserId, poiId: marker.poiData.id, liked, rating });
-                            marker.poiData.feedback = { liked, rating };
-                            debounceRecomputeWeights(500);
+                    if (!saveBtn) return;
+                    saveBtn.onclick = null;
 
-                            alert('Feedback gespeichert!');
-                        };
+                    saveBtn.onclick = async () => {
+                        const liked = likeCheckbox.checked;
+                        const rating = parseInt(ratingSelect.value || '0', 10);
+
+                        await savePoiFeedback({ userId: currentUserId, poiId: marker.poiData.id, liked, rating });
+                        marker.poiData.feedback = { liked, rating };
+                        debounceRecomputeWeights(500);
+
+                        alert('Feedback gespeichert!');
+                    };
+
+                    // Checkbox & Rating aus marker.poiData.feedback setzen
+                    if (marker.poiData.feedback) {
+                        likeCheckbox.checked = !!marker.poiData.feedback.liked;
+                        ratingSelect.value = marker.poiData.feedback.rating || '';
                     }
                 });
 
@@ -539,6 +502,8 @@ async function showMap() {
         // Event-Logging (Klicks, Zoom, Dauer)
         map.on("zoomend", () => {
             const zoom = map.getZoom();
+            const bounds = map.getBounds();
+
             const userPois = Array.from(markersByPoiId.values())
                 .map(m => m.poiData)
                 .filter(p => p);
@@ -551,11 +516,15 @@ async function showMap() {
                 target_type: "map",
                 zoom_level: zoom,
                 map_center: map.getCenter(),
-                bbox: map.getBounds()
+                bbox: bounds
             });
             markersByPoiId.forEach(marker => {
                 const poi = marker.poiData;
                 if (!poi) return;
+
+                if (!bounds.contains(marker.getLatLng())) {
+                    return;
+                }
 
                 const w = poi.weight ?? 0;
                 const norm = normalize(w, userPois);
@@ -586,13 +555,30 @@ async function showMap() {
             });
         });
         map.on("moveend", () => {
-        logInteraction({
-            event_type: "move",
-            zoom_level: map.getZoom(),
-            map_center: map.getCenter(),
-            bbox: map.getBounds()
-        });
-        debounceRecomputeWeights();
+            const bounds = map.getBounds();
+            markersByPoiId.forEach(marker => {
+                const poi = marker.poiData;
+                if (!poi) return;
+                const w = poi.weight ?? 0;
+                const category = marker.options._category || poi.category || 'gastronomy';
+                const inView = bounds.contains(marker.getLatLng());
+                const threshold = weightThresholdForZoom(map.getZoom(), computeMaxWeightLocally(
+                    Array.from(markersByPoiId.values()).map(m => m.poiData)
+                ));
+
+                if (w < threshold || !inView) {
+                    categoryLayers[category].removeLayer(marker);
+                } else {
+                    categoryLayers[category].addLayer(marker);
+                }
+            });
+            logInteraction({
+                event_type: "move",
+                zoom_level: map.getZoom(),
+                map_center: map.getCenter(),
+                bbox: map.getBounds()
+            });
+            debounceRecomputeWeights();
         });
     } catch(err) {
         await logPrototypeError("showMap", err, {currentUserId});
@@ -653,33 +639,27 @@ async function applyWeightsToMarkers(userId) {
         await logPrototypeError("applyWeightsToMarkers", err, { userId });
     }
 }
-function applyWeightsToMarkersLocally(userPois) {
-    userPois.forEach(poi => {
+function applyWeightsToMarkersLocally(userPois){
+    const center = map.getCenter();
+    userPois.forEach(poi=>{
         const marker = markersByPoiId.get(poi.id);
-        if (!marker) return;
+        if(!marker) return;
 
-        const norm = normalize(poi.weight, userPois);
-        
-        const opacity = opacityMin + norm * (opacityMax - opacityMin);
-        const scale   = scaleMin   + norm * (scaleMax   - scaleMin);
+        const viewpointBonus = computeViewpointBonus(poi, center);
+        const weightForDisplay = Math.max(0, Math.min(1, poi.weight + viewpointBonus));
 
-        /*marker.poiData.weight = poi.weight;
-
-        const w = poi.weight;
-        const scaleFactor = 0.75 + w * 0.5;*/
+        const norm = normalize(weightForDisplay, userPois);
+        const opacity = opacityMin + norm*(opacityMax-opacityMin);
+        const scale   = scaleMin   + norm*(scaleMax-scaleMin);
 
         const category = marker.options._category || poi.category || 'gastronomy';
         const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
 
-        marker.setIcon(
-            iconUrl
-                ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scale)
-                : createDefaultMarkerIcon(scale, category)
+        marker.setIcon(iconUrl
+            ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scale)
+            : createDefaultMarkerIcon(scale, category)
         );
-
-        // Opacity mapping
-        const el = marker.getElement();
-        if (el) el.style.opacity = opacity;//Math.max(0.5 + 0.7 * w);
+        marker.setOpacity(opacity);
     });
 }
 
@@ -704,22 +684,8 @@ function createPoiPopup(poi) {
         </label><br>
         <button class="save-feedback-btn">Speichern</button>
     `;
-
-    // Eventlistener direkt auf das div (Leaflet kümmert sich um Popup)
-    L.DomEvent.on(div, 'click', (e) => {
-        const target = e.target;
-        if (target.classList.contains('save-feedback-btn')) {
-            const liked = div.querySelector('.like-checkbox').checked;
-            const rating = parseInt(div.querySelector('.rating-select').value || '0', 10);
-
-            savePoiFeedback({ userId: currentUserId, poiId: poi.id, liked, rating })
-                .then(() => {
-                    poi.feedback = { liked, rating };
-                    debounceRecomputeWeights(500);
-                    alert('Feedback gespeichert!');
-                });
-        }
-    });
+    
+    // keine L.DomEvent.on hier! → Handler kommt nur einmal beim popupopen
 
     return div;
 }
@@ -840,7 +806,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
 
         for (const poi of userPois) {
             const reason = {};
-            let score = 0.5; // Basiswert, alle POIs starten hoch
+            let score = 0.5; // Basiswert
 
             // Präferenz (nur kleiner Bonus)
             const pref = userPrefs.includes(poi.category) ? 1 : 0;
@@ -872,8 +838,8 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
             if (ctxLat != null && ctxLon != null && poi.location?.coordinates) {
                 const [lon, lat] = poi.location.coordinates;
                 const dist = haversineDistance(ctxLat, ctxLon, lat, lon);
-                if (dist <= 500) distBonus = 0.05;
-                else if (dist <= 2000) distBonus = 0.05*(1-((dist-500)/1500));
+                if (dist <= 500) distBonus = 0.15;
+                else if (dist <= 2000) distBonus = 0.15*(1-((dist-500)/1500));
                 reason.distance_m = Math.round(dist);
             } else reason.distance_m = null;
             reason.distBonus = +distBonus.toFixed(3);
@@ -908,49 +874,48 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
     }
 }
 function computePoiWeightsLocally(userPois, context = {}) {
-    const ctxLat = context.lat ?? null;
-    const ctxLon = context.lon ?? null;
+    const userLat = context.userLat ?? null;   // GPS User-Position
+    const userLon = context.userLon ?? null;
+    const mapCenter = context.mapCenter ?? null; // Map-Center für Viewpoint-Bonus
     const weather = context.weather ?? null;
 
     const outdoorCats = new Set(['sport','nature','sightseeing']);
     const indoorCats = new Set(['culture','gastronomy','shopping']);
 
-    function haversineDistance(lat1, lon1, lat2, lon2) {
-        const toRad = x => x * Math.PI / 180;
-        const R = 6371000;
-        const dLat = toRad(lat2-lat1);
-        const dLon = toRad(lon2-lon1);
-        const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-
     userPois.forEach(poi => {
-        // DB-Gewicht als Ausgangspunkt
-        let score = poi.weight ?? 0; // Option B: DB-Wert als Basis
-
-        // lokale Feedback-Anpassungen, falls vorhanden
+        let baseScore = poi.weight ?? 0;
         const fb = poi.feedback || {};
-        if (fb.liked) score += 0.05;         // kleine kurzfristige Anpassung
-        if (fb.rating) score += ((fb.rating-3)/2) * 0.05; // leicht erhöhen/senken, nur kleine Wirkung
+        if(fb.liked) baseScore += 0.05;
+        if(fb.rating) baseScore += ((fb.rating-3)/2) * 0.05;
 
-        // Distanzbonus
-        if (ctxLat != null && ctxLon != null && poi.location?.coordinates) {
+        // 🔹 Distanz zum User (stabil)
+        const maxDist = 2000;   // Ab hier = 0
+        const nearDist = 500;   // Bis hier = Maximalbonus
+        const maxBonus = 0.05;
+        let distBonus = 0;
+        if(userLat!=null && userLon!=null && poi.location?.coordinates){
             const [lon, lat] = poi.location.coordinates;
-            const dist = haversineDistance(ctxLat, ctxLon, lat, lon);
-            let distBonus = 0;
-            if (dist <= 500) distBonus = 0.05;
-            else if (dist <= 2000) distBonus = 0.05*(1 - ((dist-500)/1500));
-            score += distBonus;
+            const dist = haversineDistance(userLat, userLon, lat, lon);
+            if (dist <= nearDist) {
+                distBonus = maxBonus;
+            } else if (dist <= maxDist) {
+                const t = (dist - nearDist) / (maxDist - nearDist); // normiert 0..1
+                distBonus = maxBonus * (1 - t*t);  // quadratischer Abfall
+            } else {
+                distBonus = -0.03; // kleiner Malus, wenn sehr weit weg
+            }
+            baseScore += distBonus
+            //baseScore += dist <= 500 ? 0.05 : dist <= 2000 ? 0.05*(1-((dist-500)/1500)) : -0.03;
         }
 
-        // Wetter-Anpassung
-        if (weather?.precipitation) {
-            if (outdoorCats.has(poi.category)) score -= 0.05; // outdoor bei Regen leicht unattraktiv
-            else if (indoorCats.has(poi.category)) score += 0.03; // indoor bei Regen leicht attraktiver
+        // 🔹 Wetteranpassung
+        if(weather?.precipitation){
+            if(outdoorCats.has(poi.category)) baseScore -= 0.05;
+            else if(indoorCats.has(poi.category)) baseScore += 0.03;
         }
 
-        // Clamp 0..1
-        poi.weight = Math.max(0, Math.min(1, score));
+        // Finales Gewicht: Basis + Viewpoint-Bonus
+        poi.weight = Math.max(0, Math.min(1, baseScore));
     });
 }
 /*
@@ -1073,6 +1038,22 @@ async function updatePoiWeightFromFeedback(poiId) {
     }
 }
 
+async function saveLocalWeightsToDB(userId) {
+    if(!userId) return;
+    const localWeights = Array.from(markersByPoiId.values()).map(m=>m.poiData)
+        .filter(p=>p && p.id!=null)
+        .map(p=>({ poi_id:p.id, user_id:userId, weight:p.weight, updated_at:new Date().toISOString() }));
+    if(!localWeights.length) return;
+
+    try{
+        const { error } = await client.from('poi_weights').upsert(localWeights, { onConflict: ['poi_id','user_id'] });
+        if(error) throw error;
+        console.log('✅ Local weights saved to DB.');
+    }catch(err){
+        await logPrototypeError("saveLocalWeightsToDB", err, {userId});
+    }
+}
+
 // ===== Auth-Funktionen =====
 async function handleRegistration(email, password, username) {
     const { data: signUpData, error: signUpError } = await client.auth.signUp({ email, password });
@@ -1093,12 +1074,31 @@ async function handleLogin(email, password) {
 
 async function handleLogout() {
     await endUserSession();
+
     const { error } = await client.auth.signOut();
-    if (error) { alert('Logout fehlgeschlagen: ' + error.message); return; }
+    if (error) { 
+        alert('Logout fehlgeschlagen: ' + error.message); 
+        return; 
+    }
+
+    // Map & Marker cleanup
     if (map) {
-        map.remove()
+        // Alle LayerGroups leeren
+        Object.values(categoryLayers).forEach(layer => layer.clearLayers());
+
+        // Karte selbst entfernen
+        map.remove();
         map = null;
-    };
+    }
+
+    // Globale Variablen zurücksetzen
+    markersByPoiId.clear();
+    currentUserId = null;
+    currentSessionId = null;
+    lightLayer = null;
+    darkLayer = null;
+
+    // UI zurücksetzen
     document.getElementById('map-container').style.display = 'none';
     document.getElementById('auth-container').style.display = 'block';
 }
@@ -1206,6 +1206,14 @@ document.getElementById('save-prefs-btn').addEventListener('click', async () => 
     if (error) alert("Fehler beim Speichern der Präferenzen.");
     else { alert("Präferenzen gespeichert!"); document.getElementById('prefs-popup').style.display = 'none'; }
     main();
+});
+
+window.addEventListener('beforeunload', () => {
+    if (!currentUserId) {
+        console.log("Kein eingeloggter Nutzer - Speichern wird übersprungen.");
+        return;
+    }
+    saveLocalWeightsToDB(currentUserId);
 });
 
 // ===== Main =====
