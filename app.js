@@ -564,7 +564,7 @@ async function showMap() {
         debounceRecomputeWeights();
         });
     } catch(err) {
-        await logPrototypeError("showMap", err, {userId});
+        await logPrototypeError("showMap", err, {currentUserId});
     }
 }
 
