@@ -433,7 +433,7 @@ async function showMap() {
 
                 const [lng, lat] = poi.location.coordinates;
                 const w = poi.weight ?? 0;
-                const scaleFactor = 0.8 + w * 0.4;
+                const scaleFactor = 0.75 + w * 0.5;
 
                 const markerIcon = createMarkerWithIcon(poiCategory, iconUrl, map.getZoom(), scaleFactor);
 
@@ -544,7 +544,7 @@ async function showMap() {
                 if (!poi) return;
 
                 const w = poi.weight ?? 0;
-                const scaleFactor = 0.8 + w * 0.4;
+                const scaleFactor = 0.75 + w * 0.5;
                 const category = marker.options._category || poi.category || 'gastronomy';
                 const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
 
@@ -602,7 +602,7 @@ async function applyWeightsToMarkers(userId) {
             if (marker.poiData) marker.poiData.weight = w;
 
             // size & scaleFactor
-            const scaleFactor = 0.8 + w * 0.4;
+            const scaleFactor = 0.75 + w * 0.5;
             // get iconUrl
             let iconUrl;
             try {
@@ -635,7 +635,7 @@ function applyWeightsToMarkersLocally(userPois) {
         marker.poiData.weight = poi.weight;
 
         const w = poi.weight;
-        const scaleFactor = 0.8 + w * 0.4;
+        const scaleFactor = 0.75 + w * 0.5;
 
         const category = marker.options._category || poi.category || 'gastronomy';
         const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
@@ -1035,7 +1035,7 @@ async function updatePoiWeightFromFeedback(poiId) {
     if (marker) {
         marker.poiData.weight = w;
         const iconUrl = marker.options.icon.options.html.match(/src="([^"]+)"/)?.[1];
-        const scaleFactor = 0.8 + w * 0.4;
+        const scaleFactor = 0.75 + w * 0.5;
         marker.setIcon(iconUrl 
             ? createMarkerWithIcon(marker.options._category, iconUrl, map.getZoom(), scaleFactor)
             : createDefaultMarkerIcon(scaleFactor, map.getZoom(), marker.options._category));
