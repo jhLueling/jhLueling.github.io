@@ -13,6 +13,8 @@ const markersByPoiId = new Map(); // poi.id -> marker
 let lastWeightComputationAt = 0;  // timestamp fürs Debouncing
 const WEIGHT_COMPUTATION_DEBOUNCE_MS = 1500; // vermeidet zu häufige Recalculations
 let recomputeTimeout = null;
+let opacityMin = 0.75, opacityMax = 1.0;
+let scaleMin   = 0.7, scaleMax   = 1.3;
 
 // Subkategorie-Übersetzung deutsch
 const subTypeTranslation = {
@@ -275,6 +277,15 @@ function chunkArray(arr, size) {
     return chunks;
 }
 
+function normalize(w, userPois) {
+    const weights = userPois.map(p => p.weight ?? 0);
+    const min = Math.min(...weights);
+    const max = Math.max(...weights);
+
+    if (max === min) return 0.5; // alle gleich → Mitte
+    return (w - min) / (max - min);
+}
+
 function computeMaxWeightLocally(userPois) {
     if (!userPois || userPois.length === 0) return 1;
     const weights = userPois.map(p => p.weight ?? 0);
@@ -528,6 +539,9 @@ async function showMap() {
         // Event-Logging (Klicks, Zoom, Dauer)
         map.on("zoomend", () => {
             const zoom = map.getZoom();
+            const userPois = Array.from(markersByPoiId.values())
+                .map(m => m.poiData)
+                .filter(p => p);
             const maxWeight = computeMaxWeightLocally(userPois);
             console.log("👉 MaxWeight berechnet:", maxWeight);
             const threshold = weightThresholdForZoom(zoom, maxWeight);
@@ -544,7 +558,10 @@ async function showMap() {
                 if (!poi) return;
 
                 const w = poi.weight ?? 0;
-                const scaleFactor = 0.75 + w * 0.5;
+                const norm = normalize(w, userPois);
+                const scaleFactor = scaleMin + norm * (scaleMax - scaleMin);
+                const opacity = opacityMin + norm * (opacityMax - opacityMin);
+                //const scaleFactor = 0.75 + w * 0.5;
                 const category = marker.options._category || poi.category || 'gastronomy';
                 const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
 
@@ -563,7 +580,7 @@ async function showMap() {
                 );
 
                 // Opacity
-                const opacity = 0.5 + 0.7 * w; 
+                //const opacity = 0.5 + 0.7 * w; 
                 const el = marker.getElement();
                 if (el) el.style.opacity = opacity;
             });
@@ -596,13 +613,22 @@ async function applyWeightsToMarkers(userId) {
         const weights = {};
         (weightsData || []).forEach(w => { weights[w.poi_id] = Number(w.weight); });
 
+        const userPois = Array.from(markersByPoiId.values())
+            .map(m => m.poiData)
+            .filter(p => p);
+
         markersByPoiId.forEach((marker, poiId) => {
             const w = weights[poiId] ?? (marker.poiData?.weight ?? 0);
             // update marker.poiData.weight too (so future zooms keep it)
             if (marker.poiData) marker.poiData.weight = w;
 
+            const norm = normalize(w, userPois);
+
+            const scaleFactor = scaleMin + norm * (scaleMax - scaleMin);
+            const opacity     = opacityMin + norm * (opacityMax - opacityMin);
+
             // size & scaleFactor
-            const scaleFactor = 0.75 + w * 0.5;
+            //const scaleFactor = 0.75 + w * 0.5;
             // get iconUrl
             let iconUrl;
             try {
@@ -616,10 +642,10 @@ async function applyWeightsToMarkers(userId) {
             const category = marker.options._category || (marker.poiData && marker.poiData.category) || 'gastronomy';
             marker.setIcon(iconUrl 
                 ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scaleFactor)
-                : createDefaultMarkerIcon(category, map.getZoom(), scaleFactor));
+                : createDefaultMarkerIcon(scaleFactor, category));
 
             // opacity mapping
-            const opacity = Math.max(0.5 + 0.7 * w);
+            //const opacity = Math.max(0.5 + 0.7 * w);
             const el = marker.getElement();
             if (el) el.style.opacity = opacity;
         });
@@ -632,23 +658,28 @@ function applyWeightsToMarkersLocally(userPois) {
         const marker = markersByPoiId.get(poi.id);
         if (!marker) return;
 
-        marker.poiData.weight = poi.weight;
+        const norm = normalize(poi.weight, userPois);
+        
+        const opacity = opacityMin + norm * (opacityMax - opacityMin);
+        const scale   = scaleMin   + norm * (scaleMax   - scaleMin);
+
+        /*marker.poiData.weight = poi.weight;
 
         const w = poi.weight;
-        const scaleFactor = 0.75 + w * 0.5;
+        const scaleFactor = 0.75 + w * 0.5;*/
 
         const category = marker.options._category || poi.category || 'gastronomy';
         const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
 
         marker.setIcon(
             iconUrl
-                ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scaleFactor)
-                : createDefaultMarkerIcon(scaleFactor, map.getZoom(), category)
+                ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scale)
+                : createDefaultMarkerIcon(scale, category)
         );
 
         // Opacity mapping
         const el = marker.getElement();
-        if (el) el.style.opacity = Math.max(0.5 + 0.7 * w);
+        if (el) el.style.opacity = opacity;//Math.max(0.5 + 0.7 * w);
     });
 }
 
