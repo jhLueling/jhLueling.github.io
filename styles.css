@@ -10,18 +10,27 @@ html, body, #map {
     display: none;
 }
 
+.custom-map-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #000000;
+}
+
 .custom-map-btn {
     width: 50px;
     height: 50px;
     border-radius: 12px;
-    font-size: 20px;
-    line-height: 50px;
-    text-align: center;
     background-color: #fff;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     border: none;
     cursor: pointer;
-    margin: 5px 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 0;       /* SVG nimmt volle Fläche */
+    line-height: 0;   /* verhindert vertikale Verschiebung */
 }
 
 .custom-map-btn:hover {
@@ -29,5 +38,5 @@ html, body, #map {
 }
 
 .leaflet-bottom.leaflet-right {
-  bottom: 15px; /* Abstand zum unteren Rand */
+  bottom: 50px; /* Abstand zum unteren Rand */
 }

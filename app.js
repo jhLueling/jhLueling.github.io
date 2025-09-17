@@ -315,13 +315,14 @@ async function showMap() {
         });
 
         // OSM Geocoder
-        var osmGeocoder = new L.Control.OSMGeocoder({ position: 'bottomright', text: 'Suchen', placeholder: 'Adresse eingeben' });
+        var osmGeocoder = new L.Control.OSMGeocoder({ position: 'topleft', text: 'Suchen', placeholder: 'Adresse eingeben' });
 
         // Logout Control
         const logoutControl = L.control({position: 'topright'});
         logoutControl.onAdd = function(map) {
+            const container = L.DomUtil.create('div', 'custom-map-btn-container');
             const btn = L.DomUtil.create('button', 'custom-map-btn');
-            btn.innerHTML = '⏻';
+            btn.innerHTML = '<img src="/icons/power.svg" alt="Logout" style="width:24px;height:24px;">';
             btn.title = 'Logout';
             btn.onclick = async () => { await handleLogout(); };
             return btn;
@@ -330,7 +331,7 @@ async function showMap() {
         const locateControl = L.control({position: 'topright'});
         locateControl.onAdd = function(map) {
             const btn = L.DomUtil.create('button', 'custom-map-btn');
-            btn.innerHTML = '📍';
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
             btn.title = 'Meine Position';
             btn.onclick = () => map.locate({setView: true, maxZoom: 18});
             return btn;
@@ -466,7 +467,7 @@ async function showMap() {
         map.addControl(osmGeocoder);
 
         Object.values(categoryLayers).forEach(layer => layer.addTo(map));
-        L.control.layers(null, overlayMaps, { collapsed: true, position: 'bottomleft' }).addTo(map);
+        L.control.layers(null, overlayMaps, { collapsed: true, position: 'topleft' }).addTo(map);
 
         logoutControl.addTo(map);
         locateControl.addTo(map);
