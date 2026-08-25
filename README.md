@@ -21,19 +21,23 @@ Die Anwendung kann direkt über einen aktuellen Webbrowser aufgerufen werden.
 
 ### 1. Anmeldung
 
-Beim Start der Anwendung öffnet sich zunächst ein Authentifizierungsbereich, wo sich neue Nutzer registrieren und bestehende Nutzer mit ihrem Benutzerkonto einloggen können.
+Beim Start der Anwendung öffnet sich zunächst ein Authentifizierungsbereich, wo sich neue Nutzer registrieren und bestehende Nutzer mit ihrem Benutzerkonto einloggen können:
 
-<p align="center"><img width="665" height="309" alt="Authentifizierungsbereich" src="https://github.com/user-attachments/assets/6748dcdf-e9be-4fc1-9ab9-3e83bfbf49a2" /></p>
+![Screenshot - Authentifizierung](/pictures/Authentifizierung.png)
 
 Zur Registrierung werden eine E-Mail-Adresse, ein mindestens 6-stelliges Passwort und ein Benutzername angegeben. Für den Prototypen sind keine realen persönlichen Daten erforderlich; es kann beispielsweise eine Pseudo-E-Mail-Adresse wie username@mail.com verwendet werden.
 
-Nach der ersten Anmeldung ploppt einmalig ein Popup zur Auswahl von präferierten Freizeitbereichen auf. Diese können über Checkboxen ausgewählt und anschließend gespeichert werden.
+Nach der ersten Anmeldung ploppt einmalig ein Popup zur Auswahl von präferierten Freizeitbereichen auf. Diese können über Checkboxen ausgewählt und anschließend gespeichert werden:
+
+![Screenshot - Popup zur Präferenz-Auswahl](/pictures/Praeferenz_Auswahl_Popup.png)
 
 Besitzt der Nutzer bereits ein Profil, kann er sich per E-Mail und Passwort über den Login-Bereich anmelden.
 
 Nach erfolgreicher Anmeldung wird die Kartenansicht geöffnet.
 
 ### 2. Kartenansicht
+
+![Screenshot - Initiale Kartenansicht mit POIs](/pictures/Initial_Map.png)
 
 In der Kartenansicht werden die benutzerspezifischen Points of Interest (POIs) dargestellt.
 Diese sind in 6 Haupt- und mehrere Unterkategorien aufgeteilt und werden daher durch unterschiedlich eingefärbte Marker mit verschiedenen Icons repräsentiert.
@@ -53,6 +57,8 @@ Die Karte kann nun:
 Der Ebenen-Reiter kann benutzt werden, um einzelne Freizeitbereiche/POI-Kategorien aus- & einzublenden.
 
 ### 3. POIs und Feedback
+
+![Screenshot - Popup eines POI mit näheren Infos und Bewertungsmöglichkeit](/pictures/POI_Popup.png)
 
 Durch Auswahl eines POI-Markers können weitere Informationen zum jeweiligen POI angezeigt werden.
 So erfährt man den Namen und die Unterkategorie des POI (z.B. "C&A - Kleidungsgeschäft").
