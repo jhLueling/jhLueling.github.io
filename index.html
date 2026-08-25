@@ -3,7 +3,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Interactive Map Example</title>
+    <title>Intelligent Web Map</title>
 
     <!-- Links -->
     <link rel="stylesheet" href="styles.css" />
@@ -12,9 +12,8 @@
         crossorigin=""/>
     <link rel="stylesheet" href="https://rawgit.com/k4r573n/leaflet-control-osm-geocoder/master/Control.OSMGeocoder.css"/>
 
-    <!--ToDo: Meta Bearbeiten-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="description" content="Interactive map example using Leaflet and OpenStreetMap with geocoding functionality." />
+    <meta name="description" content="Intelligent web map prototype using Leaflet and OpenStreetMap with geocoding functionality." />
     
 </head>
 
@@ -25,14 +24,12 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
 
-    <script src="https://cdn.jsdelivr.net/gh/calvinmetcalf/leaflet-ajax@v2.1.0/dist/leaflet.ajax.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/k4r573n/leaflet-control-osm-geocoder@master/Control.OSMGeocoder.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/suncalc"></script>
-    <!--<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>-->
 
     <div id="auth-container">
-        <h1>Supabase Auth Demo</h1>
+        <h1>Interaktive Freizeitkarte</h1>
 
         <h2>Registrieren</h2>
         <input type="email" id="register-email" placeholder="Email" required>
@@ -75,15 +72,11 @@
     <button id="save-prefs-btn">Speichern</button>
     </div>
 
-    
-
     <div id="map-container">
-        <!--<button id="logout-btn">Logout</button>-->
         <div id="map"></div>
     </div>
 
     <!-- Code -->
-    <!--<script type="module" src="app.js"></script>-->
     <script src="app.js"></script>
     
 </body>
