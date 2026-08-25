@@ -13,7 +13,7 @@ let lastWeightComputationAt = 0;  // timestamp fürs Debouncing
 const WEIGHT_COMPUTATION_DEBOUNCE_MS = 1500; // vermeidet zu häufige Recalculations
 let recomputeTimeout = null;
 const opacityMin = 0.7, opacityMax = 1.0;
-const scaleMin   = 0.7, scaleMax   = 1.3;
+const scaleMin = 0.7, scaleMax = 1.3;
 
 // Subkategorie-Übersetzung deutsch
 const subTypeTranslation = {
@@ -153,7 +153,7 @@ function applyAutoDarkmode(lat, lng) {
 }
 
 function computeMarkerSize(zoom, scaleFactor = 1, minS = 16, maxS = 32, minZ = 10, maxZ = 18) {
-    const baseSize = zoom <= minZ ? minS : zoom >= maxZ ? maxS : minS + ((zoom - minZ)/(maxZ - minZ))*(maxS - minS);
+    const baseSize = zoom <= minZ ? minS : zoom >= maxZ ? maxS : minS + ((zoom - minZ) / (maxZ - minZ)) * (maxS - minS);
     return Math.round(baseSize * scaleFactor);
 }
 
@@ -164,10 +164,10 @@ function createMarkerWithIcon(category, iconUrl, zoom = 14, scaleFactor = 1.0) {
     return L.divIcon({
         className: 'custom-marker',
         html: `<div style="position:relative;width:${size}px;height:${size}px;border-radius:50%;background-color:${color};display:flex;justify-content:center;align-items:center;box-shadow:0 0 4px rgba(0,0,0,0.5);">
-                <img src="${iconUrl}" style="width:${size*0.6}px;height:${size*0.6}px;"/>
+                <img src="${iconUrl}" style="width:${size * 0.6}px;height:${size * 0.6}px;"/>
                </div>`,
         iconSize: [size, size],
-        iconAnchor: [size/2, size],
+        iconAnchor: [size / 2, size],
         popupAnchor: [0, -size]
     });
 }
@@ -179,7 +179,7 @@ function createDefaultMarkerIcon(scaleFactor = 1, category = 'gastronomy') {
         className: 'custom-marker',
         html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background-color:${color};opacity:0.6;border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,0.4);"></div>`,
         iconSize: [size, size],
-        iconAnchor: [size/2, size],
+        iconAnchor: [size / 2, size],
         popupAnchor: [0, -size]
     });
 }
@@ -195,7 +195,7 @@ async function fetchWeatherForLocation(lat, lon) {
         const code = cw.weathercode ?? null;
         const precipitation = code && ((code >= 61 && code <= 82) || (code >= 71 && code <= 77));
         return { temperature: cw.temperature ?? null, weathercode: code, precipitation: !!precipitation };
-    } catch(err) { console.warn("Weather fetch failed:", err); return { temperature:null, weathercode:null, precipitation:false }; }
+    } catch (err) { console.warn("Weather fetch failed:", err); return { temperature: null, weathercode: null, precipitation: false }; }
 }
 
 function debounceRecomputeWeights(delay = WEIGHT_COMPUTATION_DEBOUNCE_MS) {
@@ -225,11 +225,11 @@ function chunkArray(arr, size) {
     return chunks;
 }
 
-function normalize(weight, allPois){
-    if(!allPois.length) return 0;
-    const wMin = Math.min(...allPois.map(p=>p.weight));
-    const wMax = Math.max(...allPois.map(p=>p.weight));
-    return wMax> wMin ? (weight-wMin)/(wMax-wMin) : 0.5;
+function normalize(weight, allPois) {
+    if (!allPois.length) return 0;
+    const wMin = Math.min(...allPois.map(p => p.weight));
+    const wMax = Math.max(...allPois.map(p => p.weight));
+    return wMax > wMin ? (weight - wMin) / (wMax - wMin) : 0.5;
 }
 
 function computeMaxWeightLocally(userPois) {
@@ -252,10 +252,10 @@ function weightThresholdForZoom(zoom, maxWeight = 1) {
 }
 
 function haversineDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371000, toRad = x => x*Math.PI/180;
-    const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
-    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const R = 6371000, toRad = x => x * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
 function computeViewpointBonus(poi, mapCenter) {
@@ -263,17 +263,17 @@ function computeViewpointBonus(poi, mapCenter) {
     const [lon, lat] = poi.location.coordinates;
 
     const dist = haversineDistance(mapCenter.lat, mapCenter.lng, lat, lon);
-    if (dist <= 500) return 0.05; 
-    else if (dist <= 2000) return 0.05 * (1 - (dist-500)/1500);
+    if (dist <= 500) return 0.05;
+    else if (dist <= 2000) return 0.05 * (1 - (dist - 500) / 1500);
     return 0;
 }
 
 // ===== Fehlerlogging =====
-async function logPrototypeError(funcName, errorObj, context = {}){
+async function logPrototypeError(funcName, errorObj, context = {}) {
     console.error(`[Error][${funcName}]`, errorObj, context);
-    try{
+    try {
         await client.from('prototype_error_log').insert([{ function: funcName, error: errorObj?.message || errorObj, context: JSON.stringify(context), created_at: new Date().toISOString() }]);
-    }catch(e){console.warn("Logging failed", e);}
+    } catch (e) { console.warn("Logging failed", e); }
 }
 
 // ===== Map-Funktionen =====
@@ -318,8 +318,8 @@ async function showMap() {
         var osmGeocoder = new L.Control.OSMGeocoder({ position: 'topleft', text: 'Suchen', placeholder: 'Adresse eingeben' });
 
         // Logout Control
-        const logoutControl = L.control({position: 'topright'});
-        logoutControl.onAdd = function(map) {
+        const logoutControl = L.control({ position: 'topright' });
+        logoutControl.onAdd = function (map) {
             const container = L.DomUtil.create('div', 'custom-map-btn-container');
             const btn = L.DomUtil.create('button', 'custom-map-btn');
             btn.innerHTML = '<img src="/icons/power.svg" alt="Logout" style="width:24px;height:24px;">';
@@ -328,12 +328,12 @@ async function showMap() {
             return btn;
         };
 
-        const locateControl = L.control({position: 'topright'});
-        locateControl.onAdd = function(map) {
+        const locateControl = L.control({ position: 'topright' });
+        locateControl.onAdd = function (map) {
             const btn = L.DomUtil.create('button', 'custom-map-btn');
             btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>';
             btn.title = 'Meine Position';
-            btn.onclick = () => map.locate({setView: true, maxZoom: 18});
+            btn.onclick = () => map.locate({ setView: true, maxZoom: 18 });
             return btn;
         };
 
@@ -459,7 +459,7 @@ async function showMap() {
 
                 markersByPoiId.set(poi.id, marker);
                 categoryLayers[poiCategory].addLayer(marker);
-            } catch(err) {
+            } catch (err) {
                 logPrototypeError("showMap-marker-setup", err, { currentUserId, poi });
             }
         });
@@ -479,7 +479,7 @@ async function showMap() {
             try {
                 const center = map.getCenter();
                 ctxLat = center.lat; ctxLon = center.lng;
-            } catch (e) { 
+            } catch (e) {
                 const first = userPois[0];
                 if (first && first.location) { ctxLat = first.location.coordinates[1]; ctxLon = first.location.coordinates[0]; }
             }
@@ -569,8 +569,8 @@ async function showMap() {
             });
             debounceRecomputeWeights();
         });
-    } catch(err) {
-        await logPrototypeError("showMap", err, {currentUserId});
+    } catch (err) {
+        await logPrototypeError("showMap", err, { currentUserId });
     }
 }
 
@@ -600,7 +600,7 @@ async function applyWeightsToMarkers(userId) {
             const norm = normalize(w, userPois);
 
             const scaleFactor = scaleMin + norm * (scaleMax - scaleMin);
-            const opacity     = opacityMin + norm * (opacityMax - opacityMin);
+            const opacity = opacityMin + norm * (opacityMax - opacityMin);
 
             // size & scaleFactor
             //const scaleFactor = 0.75 + w * 0.5;
@@ -610,12 +610,12 @@ async function applyWeightsToMarkers(userId) {
                 const html = marker.options.icon.options.html;
                 const m = html.match(/src="([^"]+)"/);
                 iconUrl = m ? m[1] : null;
-            } catch(e) {
+            } catch (e) {
                 iconUrl = null;
             }
 
             const category = marker.options._category || (marker.poiData && marker.poiData.category) || 'gastronomy';
-            marker.setIcon(iconUrl 
+            marker.setIcon(iconUrl
                 ? createMarkerWithIcon(category, iconUrl, map.getZoom(), scaleFactor)
                 : createDefaultMarkerIcon(scaleFactor, category));
 
@@ -624,22 +624,22 @@ async function applyWeightsToMarkers(userId) {
             const el = marker.getElement();
             if (el) el.style.opacity = opacity;
         });
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("applyWeightsToMarkers", err, { userId });
     }
 }
-function applyWeightsToMarkersLocally(userPois){
+function applyWeightsToMarkersLocally(userPois) {
     const center = map.getCenter();
-    userPois.forEach(poi=>{
+    userPois.forEach(poi => {
         const marker = markersByPoiId.get(poi.id);
-        if(!marker) return;
+        if (!marker) return;
 
         const viewpointBonus = computeViewpointBonus(poi, center);
         const weightForDisplay = Math.max(0, Math.min(1, poi.weight + viewpointBonus));
 
         const norm = normalize(weightForDisplay, userPois);
-        const opacity = opacityMin + norm*(opacityMax-opacityMin);
-        const scale   = scaleMin   + norm*(scaleMax-scaleMin);
+        const opacity = opacityMin + norm * (opacityMax - opacityMin);
+        const scale = scaleMin + norm * (scaleMax - scaleMin);
 
         const category = marker.options._category || poi.category || 'gastronomy';
         const iconUrl = marker.iconUrl || marker.options.icon.options.html?.match(/src="([^"]+)"/)?.[1];
@@ -668,12 +668,12 @@ function createPoiPopup(poi) {
             Bewertung:
             <select class="rating-select">
                 <option value="">---</option>
-                ${[1,2,3,4,5].map(n => `<option value="${n}" ${fb.rating===n?'selected':''}>${n}</option>`).join('')}
+                ${[1, 2, 3, 4, 5].map(n => `<option value="${n}" ${fb.rating === n ? 'selected' : ''}>${n}</option>`).join('')}
             </select>
         </label><br>
         <button class="save-feedback-btn">Speichern</button>
     `;
-    
+
     // keine L.DomEvent.on hier! → Handler kommt nur einmal beim popupopen
 
     return div;
@@ -684,7 +684,7 @@ async function fetchRandomPoisByCity(userId) {
         const { data: allPois, error } = await client
             .from('pois')
             .select('*')
-            .in('category', ['gastronomy','culture','sport','nature','sightseeing','shopping'])
+            .in('category', ['gastronomy', 'culture', 'sport', 'nature', 'sightseeing', 'shopping'])
             .neq('isunnamed', true);
 
         if (error) throw error;
@@ -702,7 +702,7 @@ async function fetchRandomPoisByCity(userId) {
         const { error: insertError } = await client.from("user_pois").insert(rows);
         if (insertError) throw insertError;
         console.log(`✅ ${rows.length} POIs dem User ${userId} zugewiesen`);
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("fetchRandomPoisByCity", err, { userId });
     }
 }
@@ -746,8 +746,8 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
         const feedbackByPoi = {};
         allFeedback.forEach(f => { feedbackByPoi[f.poi_id] = f; });
 
-        // 3️⃣ Klicks der letzten 3 Tage laden
-        const twoDaysAgo = new Date(Date.now() - 2*24*3600*1000).toISOString();
+        // 3️⃣ Klicks der letzten 2 Tage laden
+        const twoDaysAgo = new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
         let allClicks = [];
         for (const chunk of poiChunks) {
             const { data, error } = await client
@@ -771,22 +771,22 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
             weather = await fetchWeatherForLocation(context.lat, context.lon);
         }
 
-        const outdoorCats = new Set(['sport','nature','sightseeing']);
-        const indoorCats = new Set(['culture','gastronomy','shopping']);
+        const outdoorCats = new Set(['sport', 'nature', 'sightseeing']);
+        const indoorCats = new Set(['culture', 'gastronomy', 'shopping']);
 
         // Distanzberechnung
         function haversineDistance(lat1, lon1, lat2, lon2) {
             const toRad = x => x * Math.PI / 180;
             const R = 6371000;
-            const dLat = toRad(lat2-lat1);
-            const dLon = toRad(lon2-lon1);
-            const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         }
 
         // Sigmoid-artige Transformation für hohe Werte
         function squashScore(s) {
-            return 1 / (1 + Math.exp(-10*(s-0.6))); // shift + scale
+            return 1 / (1 + Math.exp(-10 * (s - 0.6))); // shift + scale
         }
 
         const rowsToUpsert = [];
@@ -809,7 +809,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
                 if (fb.liked) fbScore += 0.15;
                 if (fb.rating) fbScore += ((fb.rating - 1) / 4) * 0.15;
                 if (fb.visited_at) {
-                    const days = (Date.now() - new Date(fb.visited_at).getTime()) / (24*3600*1000);
+                    const days = (Date.now() - new Date(fb.visited_at).getTime()) / (24 * 3600 * 1000);
                     if (days <= 7) fbScore += 0.05;
                 }
             }
@@ -828,7 +828,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
                 const [lon, lat] = poi.location.coordinates;
                 const dist = haversineDistance(ctxLat, ctxLon, lat, lon);
                 if (dist <= 500) distBonus = 0.15;
-                else if (dist <= 2000) distBonus = 0.15*(1-((dist-500)/1500));
+                else if (dist <= 2000) distBonus = 0.15 * (1 - ((dist - 500) / 1500));
                 reason.distance_m = Math.round(dist);
             } else reason.distance_m = null;
             reason.distBonus = +distBonus.toFixed(3);
@@ -858,7 +858,7 @@ async function computeAndStorePoiWeights(userId, userPois, context = {}) {
         const { error: upsertError } = await client.from('poi_weights').upsert(rowsToUpsert, { onConflict: ['user_id', 'poi_id'] });
         if (upsertError) throw upsertError;
         console.log("✅ poi_weights upserted:", rowsToUpsert.length);
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("computeAndStorePoiWeights", err, { userId, context });
     }
 }
@@ -868,28 +868,28 @@ function computePoiWeightsLocally(userPois, context = {}) {
     const mapCenter = context.mapCenter ?? null; // Map-Center für Viewpoint-Bonus
     const weather = context.weather ?? null;
 
-    const outdoorCats = new Set(['sport','nature','sightseeing']);
-    const indoorCats = new Set(['culture','gastronomy','shopping']);
+    const outdoorCats = new Set(['sport', 'nature', 'sightseeing']);
+    const indoorCats = new Set(['culture', 'gastronomy', 'shopping']);
 
     userPois.forEach(poi => {
         let baseScore = poi.weight ?? 0;
         const fb = poi.feedback || {};
-        if(fb.liked) baseScore += 0.05;
-        if(fb.rating) baseScore += ((fb.rating-3)/2) * 0.05;
+        if (fb.liked) baseScore += 0.05;
+        if (fb.rating) baseScore += ((fb.rating - 3) / 2) * 0.05;
 
         // 🔹 Distanz zum User (stabil)
         const maxDist = 2000;   // Ab hier = 0
         const nearDist = 500;   // Bis hier = Maximalbonus
         const maxBonus = 0.05;
         let distBonus = 0;
-        if(userLat!=null && userLon!=null && poi.location?.coordinates){
+        if (userLat != null && userLon != null && poi.location?.coordinates) {
             const [lon, lat] = poi.location.coordinates;
             const dist = haversineDistance(userLat, userLon, lat, lon);
             if (dist <= nearDist) {
                 distBonus = maxBonus;
             } else if (dist <= maxDist) {
                 const t = (dist - nearDist) / (maxDist - nearDist); // normiert 0..1
-                distBonus = maxBonus * (1 - t*t);  // quadratischer Abfall
+                distBonus = maxBonus * (1 - t * t);  // quadratischer Abfall
             } else {
                 distBonus = -0.03; // kleiner Malus, wenn sehr weit weg
             }
@@ -898,9 +898,9 @@ function computePoiWeightsLocally(userPois, context = {}) {
         }
 
         // 🔹 Wetteranpassung
-        if(weather?.precipitation){
-            if(outdoorCats.has(poi.category)) baseScore -= 0.05;
-            else if(indoorCats.has(poi.category)) baseScore += 0.03;
+        if (weather?.precipitation) {
+            if (outdoorCats.has(poi.category)) baseScore -= 0.05;
+            else if (indoorCats.has(poi.category)) baseScore += 0.03;
         }
 
         // Finales Gewicht: Basis + Viewpoint-Bonus
@@ -921,16 +921,16 @@ async function loadUserPois(userId) {
         const { data, error } = await client.from("user_pois").select("pois(*)").eq("user_id", userId);
         if (error) throw error;
         return data.map(entry => entry.pois);
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("loadUserPois", err, { userId });
         return [];
     }
 }
 async function deleteUserPois(userId) {
-    try {  
+    try {
         const { data, error } = await client.from("user_pois").delete("*").eq("user_id", userId);
         if (error) throw error;
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("deleteUserPois", err, { userId });
         return [];
     }
@@ -954,22 +954,22 @@ async function logInteraction({ event_type, target_type = null, target_id = null
         }
 
         const row = {
-        user_id: currentUserId,
-        session_id: currentSessionId,
-        event_type,
-        target_type,
-        target_id,
-        zoom_level,
-        duration_ms,
-        map_center,
-        bbox,
-        metadata
+            user_id: currentUserId,
+            session_id: currentSessionId,
+            event_type,
+            target_type,
+            target_id,
+            zoom_level,
+            duration_ms,
+            map_center,
+            bbox,
+            metadata
         };
         const { error } = await client.from("interactions").insert(row);
         if (error) throw error;
         console.log("✅ Interaction gespeichert:", event_type, target_type, target_id);
-    } catch(err) {
-        await logPrototypeError("logInteraction", err, {currentUserId});
+    } catch (err) {
+        await logPrototypeError("logInteraction", err, { currentUserId });
     }
 }
 async function savePoiFeedback({ userId, poiId, liked = false, rating }) {
@@ -978,7 +978,7 @@ async function savePoiFeedback({ userId, poiId, liked = false, rating }) {
         // DB-Update
         const { error } = await client.from('user_poi_feedback').upsert(
             { user_id: userId, poi_id: poiId, liked, rating, visited_at: new Date() },
-            { onConflict: ['user_id','poi_id'] }
+            { onConflict: ['user_id', 'poi_id'] }
         );
 
         console.log("✅ Feedback gespeichert:", { userId, poiId, liked, rating });
@@ -989,7 +989,7 @@ async function savePoiFeedback({ userId, poiId, liked = false, rating }) {
             marker.poiData.feedback = { liked, rating };
             debounceRecomputeWeights(500); // lokal
         }
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("savePoiFeedback", err, { userId, poiId, liked, rating });
     }
 }
@@ -1013,7 +1013,7 @@ async function updatePoiWeightFromFeedback(poiId) {
         poi_id: poiId,
         weight: w,
         updated_at: new Date()
-    }, { onConflict: ['user_id','poi_id'] });
+    }, { onConflict: ['user_id', 'poi_id'] });
 
     // Marker neu skalieren
     const marker = markersByPoiId.get(poiId);
@@ -1021,25 +1021,25 @@ async function updatePoiWeightFromFeedback(poiId) {
         marker.poiData.weight = w;
         const iconUrl = marker.options.icon.options.html.match(/src="([^"]+)"/)?.[1];
         const scaleFactor = 0.75 + w * 0.5;
-        marker.setIcon(iconUrl 
+        marker.setIcon(iconUrl
             ? createMarkerWithIcon(marker.options._category, iconUrl, map.getZoom(), scaleFactor)
             : createDefaultMarkerIcon(scaleFactor, map.getZoom(), marker.options._category));
     }
 }
 
 async function saveLocalWeightsToDB(userId) {
-    if(!userId) return;
-    const localWeights = Array.from(markersByPoiId.values()).map(m=>m.poiData)
-        .filter(p=>p && p.id!=null)
-        .map(p=>({ poi_id:p.id, user_id:userId, weight:p.weight, updated_at:new Date().toISOString() }));
-    if(!localWeights.length) return;
+    if (!userId) return;
+    const localWeights = Array.from(markersByPoiId.values()).map(m => m.poiData)
+        .filter(p => p && p.id != null)
+        .map(p => ({ poi_id: p.id, user_id: userId, weight: p.weight, updated_at: new Date().toISOString() }));
+    if (!localWeights.length) return;
 
-    try{
-        const { error } = await client.from('poi_weights').upsert(localWeights, { onConflict: ['poi_id','user_id'] });
-        if(error) throw error;
+    try {
+        const { error } = await client.from('poi_weights').upsert(localWeights, { onConflict: ['poi_id', 'user_id'] });
+        if (error) throw error;
         console.log('✅ Local weights saved to DB.');
-    }catch(err){
-        await logPrototypeError("saveLocalWeightsToDB", err, {userId});
+    } catch (err) {
+        await logPrototypeError("saveLocalWeightsToDB", err, { userId });
     }
 }
 
@@ -1065,9 +1065,9 @@ async function handleLogout() {
     await endUserSession();
 
     const { error } = await client.auth.signOut();
-    if (error) { 
-        alert('Logout fehlgeschlagen: ' + error.message); 
-        return; 
+    if (error) {
+        alert('Logout fehlgeschlagen: ' + error.message);
+        return;
     }
 
     // Map & Marker cleanup
@@ -1100,7 +1100,7 @@ async function loadUserPrefs() {
         const { data: prefs, error } = await client.from('user_category_prefs').select('category').eq('user_id', user.id);
         if (error) throw error;
         return prefs.map(p => p.category);
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("loadUserPrefs", err, { currentUserId });
         return [];
     }
@@ -1121,7 +1121,7 @@ async function createUserSession(userId) {
         currentUserId = userId;
         console.log("✅ Session gestartet:", currentSessionId);
         return currentSessionId;
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("createUserSession", err, { userId });
         return null;
     }
@@ -1140,7 +1140,7 @@ async function initUserSession() {
         } else {
             console.log("⚠️ Kein User eingeloggt.");
         }
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("initUserSession", err, {});
     }
 }
@@ -1161,7 +1161,7 @@ async function endUserSession() {
 
         currentSessionId = null;
         currentUserId = null;
-    } catch(err) {
+    } catch (err) {
         await logPrototypeError("endUserSession", err, { currentUserId, currentSessionId });
     }
 }
