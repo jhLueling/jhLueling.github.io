@@ -32,31 +32,33 @@ Nach erfolgreicher Anmeldung wird die Kartenansicht geöffnet.
 
 ### 2. Kartenansicht
 
-In der Kartenansicht werden die verfügbaren Points of Interest (POIs) dargestellt.
+In der Kartenansicht werden die benutzerspezifischen Points of Interest (POIs) dargestellt.
+Diese sind in 6 Haupt- und mehrere Unterkategorien aufgeteilt und werden daher durch unterschiedlich eingefärbte Marker mit verschiedenen Icons repräsentiert.
+Die 6 Hauptkategorien sind Gastronomie, Kultur, Sport, Natur, Einkaufen und Sehenswürdigkeiten.
 
-Die Karte kann:
+Um die Performance des Prototyps zu verbessern, werden für jeden Nutzer nach der ersten Anmeldung einmalig eine Zufallsmenge an POIs ausgewählt. Diese sind auf die Städte Bochum (Standort der Hochschule) und Iserlohn (Heimatstadt des Entwicklers) begrenzt.
 
-- mit der Maus verschoben werden,
-- vergrößert und verkleinert werden,
-- über die vorhandenen Kartensteuerungen bedient werden.
+Nach dem Öffnen der Karte zentriert sich die Ansicht auf den Standort des Nutzers (ggf. muss hierzu erst der Standortnutzung zugestimmt werden). Ein farbiger Umkreis zeigt die aktuelle Genauigkeit des Standorts.
+Zusätzlich werden die benutzerspezifischen POI-Marker geladen und entsprechend ihrer aktuellen Relevanz dargestellt.
 
-Die POIs werden abhängig von ihrer ermittelten Relevanz unterschiedlich dargestellt.
+Die Karte kann nun:
 
-### 3. Persönliche Präferenzen
+- verschoben werden --> Klicken & Ziehen mit der Maus / Wischen mit dem Finger (Mobilgerät),
+- vergrößert und verkleinert werden --> Mausrad / Pinch-to-Zoom (Mobilgerät),
+- über die vorhandenen Kartensteuerungen bedient werden --> Zoom-Buttons (links oben), Pfeiltasten der Tastatur.
 
-Über die dafür vorgesehene Funktion können persönliche Interessen bzw. bevorzugte POI-Kategorien festgelegt werden.
+Der Ebenen-Reiter kann benutzt werden, um einzelne Freizeitbereiche/POI-Kategorien aus- oder einzublenden.
 
-Diese Informationen werden bei der Ermittlung der POI-Gewichte berücksichtigt.
-
-### 4. POIs und Feedback
+### 3. POIs und Feedback
 
 Durch Auswahl eines POI-Markers können weitere Informationen zum jeweiligen POI angezeigt werden.
+So erfährt man den Namen und die Unterkategorie des POI (z.B. "C&A - Kleidungsgeschäft").
 
-Je nach vorhandenen Funktionen können POIs bewertet bzw. mit Feedback versehen werden.
+Außerdem können POIs über das Popup bewertet bzw. mit Feedback versehen werden. Dazu kann man eine einfache "Gefällt mir"-Checkbox anhaken und/oder bis zu 5 Punkte (ähnlich einer Google-Bewertung) vergeben.
 
-Nutzerinteraktionen mit POIs werden ebenfalls bei der Personalisierung berücksichtigt.
+Nutzerinteraktionen mit POIs (Klicks, Bewertungen) werden bei der Personalisierung berücksichtigt.
 
-### 5. Kontextabhängige Anpassung
+### 4. Kontextabhängige Anpassung
 
 Die Anwendung berücksichtigt neben nutzerbezogenen Informationen auch aktuelle Kontextinformationen.
 
@@ -72,9 +74,13 @@ Zusätzlich wird der aktuelle Kartenausschnitt bei der Darstellung berücksichti
 
 Die Gewichtung erfolgt regelbasiert. Die resultierenden Werte beeinflussen unter anderem die visuelle Darstellung der POI-Marker.
 
-### 6. Standort
+### 5. Standort
 
-Über die Standortfunktion kann die aktuelle Position des Benutzers auf der Karte angezeigt werden.
+Über die Standortfunktion (Fadenkreuz) kann die aktuelle Position des Benutzers auf der Karte angezeigt werden.
+
+### 6. Adress-Suche
+
+Über die Suchleiste kann eine bestimmte Adresse geladen werden.
 
 ### 7. Kartenansicht verändern
 
@@ -82,7 +88,7 @@ Beim Verschieben des Kartenausschnitts wird der aktuelle Kartenkontext berücksi
 
 ### 8. Abmelden
 
-Über die Logout-Funktion kann die aktuelle Sitzung beendet werden.
+Über die Logout-Funktion (Power-Button) kann die aktuelle Sitzung beendet werden.
 
 ---
 
@@ -126,5 +132,4 @@ Die wichtigsten Dateien und Verzeichnisse des Projekts sind:
 ├── index.html
 ├── app.js
 ├── styles.css
-├── mapping/
 └── ...
