@@ -3,6 +3,7 @@
 Dieser Prototyp wurde im Rahmen der Bachelorarbeit **„Prototyp für eine intelligente Web-Map“** im Studiengang Geoinformatik an der Hochschule Bochum entwickelt.
 
 Ziel des Prototypen ist die Bereitstellung einer kontextabhängigen Web-Map, welche die dahinterliegende Idee von intelligenten Karten, die sich automatisch an aktuelle Nutzungskontexte anpassen, demonstriert und für Nutzer und Nutzerinnen erfahrbar macht.
+
 Er wurde als lauffähige Live-Anwendung entwickelt, bei der die Darstellung von Points of Interest (POIs) anhand von Nutzerinformationen und aktuellen Kontextinformationen angepasst wird.
 
 Thematisch stellt die Webkarte eine interaktive Freizeitkarte dar, die bei der Auswahl von Freizeitaktivitäten (z.B. im Bereich Gastronomie, Einkaufen, Kultur) unterstützen soll.
@@ -24,6 +25,7 @@ Beim Start der Anwendung öffnet sich zunächst ein Authentifizierungsbereich, w
 
 Zur Registration muss man sich mit einer Pseudo-Email (z.B. der Form username@mail.com), einem min. 6-stelligen Passwort und einem Benutzernamen anmelden.
 Da für den Prototypen lediglich ein echter Authentifizierungs-Vorgang nachgeahmt wird, werden hier keine realen Informationen erwartet.
+
 Nach der ersten Anmeldung ploppt einmalig ein Popup zur Auswahl von präferierten Freizeitbereichen auf. Diese können über Checkboxen ausgewählt und anschließend gespeichert werden.
 
 Besitzt der Nutzer bereits ein Profil, kann er sich per E-Mail und Passwort über den Login-Bereich anmelden.
@@ -47,7 +49,7 @@ Die Karte kann nun:
 - vergrößert und verkleinert werden --> Mausrad / Pinch-to-Zoom (Mobilgerät),
 - über die vorhandenen Kartensteuerungen bedient werden --> Zoom-Buttons (links oben), Pfeiltasten der Tastatur.
 
-Der Ebenen-Reiter kann benutzt werden, um einzelne Freizeitbereiche/POI-Kategorien aus- oder einzublenden.
+Der Ebenen-Reiter kann benutzt werden, um einzelne Freizeitbereiche/POI-Kategorien aus- & einzublenden.
 
 ### 3. POIs und Feedback
 
@@ -62,6 +64,9 @@ Nutzerinteraktionen mit POIs (Klicks, Bewertungen) werden bei der Personalisieru
 
 Die Anwendung berücksichtigt neben nutzerbezogenen Informationen auch aktuelle Kontextinformationen.
 
+Die gesammelten Informationen werden dazu verwendet die POIs anhand von festgelegten Kriterien und Regeln unterschiedlich stark zu gewichten.
+Dadurch soll ein für den jeweiligen Nutzer optimiertes Anwendungserlebnis ermöglicht werden.
+
 Für die Gewichtung der POIs werden unter anderem folgende Einflussfaktoren berücksichtigt:
 
 - persönliche Präferenzen,
@@ -72,7 +77,8 @@ Für die Gewichtung der POIs werden unter anderem folgende Einflussfaktoren ber�
 
 Zusätzlich wird der aktuelle Kartenausschnitt bei der Darstellung berücksichtigt.
 
-Die Gewichtung erfolgt regelbasiert. Die resultierenden Werte beeinflussen unter anderem die visuelle Darstellung der POI-Marker.
+Die resultierenden Werte beeinflussen maßgeblich die visuelle Darstellung der POI-Marker.
+Dazu gehören die Größe, die Transparenz und die Sichtbarkeit auf bestimmten Zoomstufen.
 
 ### 5. Standort
 
