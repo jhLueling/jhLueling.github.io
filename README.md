@@ -23,8 +23,9 @@ Die Anwendung kann direkt über einen aktuellen Webbrowser aufgerufen werden.
 
 Beim Start der Anwendung öffnet sich zunächst ein Authentifizierungsbereich, wo sich neue Nutzer registrieren und bestehende Nutzer mit ihrem Benutzerkonto einloggen können.
 
-Zur Registration muss man sich mit einer Pseudo-Email (z.B. der Form username@mail.com), einem min. 6-stelligen Passwort und einem Benutzernamen anmelden.
-Da für den Prototypen lediglich ein echter Authentifizierungs-Vorgang nachgeahmt wird, werden hier keine realen Informationen erwartet.
+<p align="center"><img width="665" height="309" alt="Authentifizierungsbereich" src="https://github.com/user-attachments/assets/6748dcdf-e9be-4fc1-9ab9-3e83bfbf49a2" /></p>
+
+Zur Registrierung werden eine E-Mail-Adresse, ein mindestens 6-stelliges Passwort und ein Benutzername angegeben. Für den Prototypen sind keine realen persönlichen Daten erforderlich; es kann beispielsweise eine Pseudo-E-Mail-Adresse wie username@mail.com verwendet werden.
 
 Nach der ersten Anmeldung ploppt einmalig ein Popup zur Auswahl von präferierten Freizeitbereichen auf. Diese können über Checkboxen ausgewählt und anschließend gespeichert werden.
 
@@ -38,7 +39,7 @@ In der Kartenansicht werden die benutzerspezifischen Points of Interest (POIs) d
 Diese sind in 6 Haupt- und mehrere Unterkategorien aufgeteilt und werden daher durch unterschiedlich eingefärbte Marker mit verschiedenen Icons repräsentiert.
 Die 6 Hauptkategorien sind Gastronomie, Kultur, Sport, Natur, Einkaufen und Sehenswürdigkeiten.
 
-Um die Performance des Prototyps zu verbessern, werden für jeden Nutzer nach der ersten Anmeldung einmalig eine Zufallsmenge an POIs ausgewählt. Diese sind auf die Städte Bochum (Standort der Hochschule) und Iserlohn (Heimatstadt des Entwicklers) begrenzt.
+Um die Performance des Prototyps zu verbessern, wird jedem Nutzer bei der ersten Anmeldung einmalig eine zufällig ausgewählte Teilmenge der verfügbaren POIs zugewiesen. Diese sind auf die Städte Bochum (Standort der Hochschule) und Iserlohn begrenzt.
 
 Nach dem Öffnen der Karte zentriert sich die Ansicht auf den Standort des Nutzers (ggf. muss hierzu erst der Standortnutzung zugestimmt werden). Ein farbiger Umkreis zeigt die aktuelle Genauigkeit des Standorts.
 Zusätzlich werden die benutzerspezifischen POI-Marker geladen und entsprechend ihrer aktuellen Relevanz dargestellt.
@@ -65,7 +66,7 @@ Nutzerinteraktionen mit POIs (Klicks, Bewertungen) werden bei der Personalisieru
 Die Anwendung berücksichtigt neben nutzerbezogenen Informationen auch aktuelle Kontextinformationen.
 
 Die gesammelten Informationen werden dazu verwendet die POIs anhand von festgelegten Kriterien und Regeln unterschiedlich stark zu gewichten.
-Dadurch soll ein für den jeweiligen Nutzer optimiertes Anwendungserlebnis ermöglicht werden.
+Dadurch soll die Darstellung der POIs an den jeweiligen Nutzer und den aktuellen Nutzungskontext angepasst werden.
 
 Für die Gewichtung der POIs werden unter anderem folgende Einflussfaktoren berücksichtigt:
 
@@ -77,8 +78,8 @@ Für die Gewichtung der POIs werden unter anderem folgende Einflussfaktoren ber�
 
 Zusätzlich wird der aktuelle Kartenausschnitt bei der Darstellung berücksichtigt.
 
-Die resultierenden Werte beeinflussen maßgeblich die visuelle Darstellung der POI-Marker.
-Dazu gehören die Größe, die Transparenz und die Sichtbarkeit auf bestimmten Zoomstufen.
+Die resultierenden Werte beeinflussen die visuelle Darstellung der POI-Marker.
+Dazu gehören insbesondere die Größe und Transparenz der Marker sowie deren Anzeige abhängig von der aktuellen Zoomstufe.
 
 ### 5. Standort
 
@@ -86,7 +87,7 @@ Dazu gehören die Größe, die Transparenz und die Sichtbarkeit auf bestimmten Z
 
 ### 6. Adress-Suche
 
-Über die Suchleiste kann eine bestimmte Adresse geladen werden.
+Über die Suchleiste kann nach einer Adresse gesucht und die entsprechende Position auf der Karte angezeigt werden.
 
 ### 7. Kartenansicht verändern
 
