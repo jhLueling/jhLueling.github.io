@@ -9,7 +9,6 @@ let lightLayer, darkLayer;
 let categoryIcons; // Icons für Kategorien/Subtypen
 let currentSessionId, currentUserId; // aktuelle Session-ID
 const markersByPoiId = new Map(); // poi.id -> marker
-let lastWeightComputationAt = 0;  // timestamp fürs Debouncing
 const WEIGHT_COMPUTATION_DEBOUNCE_MS = 1500; // vermeidet zu häufige Recalculations
 let recomputeTimeout = null;
 const opacityMin = 0.7, opacityMax = 1.0;
@@ -991,39 +990,6 @@ async function savePoiFeedback({ userId, poiId, liked = false, rating }) {
         }
     } catch (err) {
         await logPrototypeError("savePoiFeedback", err, { userId, poiId, liked, rating });
-    }
-}
-
-async function updatePoiWeightFromFeedback(poiId) {
-    const { data: feedback } = await client
-        .from('user_poi_feedback')
-        .select('liked, rating')
-        .eq('user_id', currentUserId)
-        .eq('poi_id', poiId)
-        .single();
-
-    if (!feedback) return;
-
-    // Berechne Gewicht z.B.: liked = 1, rating 1-5 → normalize 0..1
-    const w = (feedback.liked ? 0.6 : 0) + (feedback.rating ? feedback.rating / 5 * 0.4 : 0);
-
-    // Upsert in poi_weights
-    await client.from('poi_weights').upsert({
-        user_id: currentUserId,
-        poi_id: poiId,
-        weight: w,
-        updated_at: new Date()
-    }, { onConflict: ['user_id', 'poi_id'] });
-
-    // Marker neu skalieren
-    const marker = markersByPoiId.get(poiId);
-    if (marker) {
-        marker.poiData.weight = w;
-        const iconUrl = marker.options.icon.options.html.match(/src="([^"]+)"/)?.[1];
-        const scaleFactor = 0.75 + w * 0.5;
-        marker.setIcon(iconUrl
-            ? createMarkerWithIcon(marker.options._category, iconUrl, map.getZoom(), scaleFactor)
-            : createDefaultMarkerIcon(scaleFactor, map.getZoom(), marker.options._category));
     }
 }
 
