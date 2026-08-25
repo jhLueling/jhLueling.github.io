@@ -138,4 +138,6 @@ Die wichtigsten Dateien und Verzeichnisse des Projekts sind:
 ├── index.html
 ├── app.js
 ├── styles.css
+├── data/Icons.json
+├── icons/
 └── ...
