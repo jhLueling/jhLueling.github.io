@@ -20,7 +20,13 @@ Die Anwendung kann direkt über einen aktuellen Webbrowser aufgerufen werden.
 
 ### 1. Anmeldung
 
-Beim Start der Anwendung kann sich ein bestehender Benutzer anmelden oder ein neues Benutzerkonto erstellen.
+Beim Start der Anwendung öffnet sich zunächst ein Authentifizierungsbereich, wo sich neue Nutzer registrieren und bestehende Nutzer mit ihrem Benutzerkonto einloggen können.
+
+Zur Registration muss man sich mit einer Pseudo-Email (z.B. der Form username@mail.com), einem min. 6-stelligen Passwort und einem Benutzernamen anmelden.
+Da für den Prototypen lediglich ein echter Authentifizierungs-Vorgang nachgeahmt wird, werden hier keine realen Informationen erwartet.
+Nach der ersten Anmeldung ploppt einmalig ein Popup zur Auswahl von präferierten Freizeitbereichen auf. Diese können über Checkboxen ausgewählt und anschließend gespeichert werden.
+
+Besitzt der Nutzer bereits ein Profil, kann er sich per E-Mail und Passwort über den Login-Bereich anmelden.
 
 Nach erfolgreicher Anmeldung wird die Kartenansicht geöffnet.
 
